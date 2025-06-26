@@ -1,0 +1,60 @@
+//AGREGAR PRODUCTOS A LA TABLA COMPRA
+// const agregarProductoACompra = (producto) => {
+//   setProductosCompra(prev => [...prev, { ...producto, cantidad: 1 }]);
+// };
+
+
+//REGISTRAR COMPRA Y LOTE VIEJO
+//   const registrarCompraYLote = () => {
+//   if (!metodopagoseleccionado) {
+//     Swal.fire({
+//       icon: 'warning',
+//       title: 'Método de pago requerido',
+//       text: 'Por favor, seleccione un método de pago antes de continuar con la compra.',
+//       confirmButtonColor: '3085d6',
+//       timer: 3500,
+//       timerProgressBar: true
+//     });
+//     return
+//   }
+//   const cantidadProductos = productosCompra.length;
+//   const descripciondecompra = `Se realizo la compra de: ${cantidadProductos} medicamentos.`
+//   axios.post(`${URL}compra/post`, 
+//   {
+//     descripcion_compra: descripciondecompra,
+//     Id_drogueria: Id_drogueria,
+//     Id_metodoPago: metodopagoseleccionado,
+//     Total: totalCompra
+//   })
+//   .then(() => {
+//     axios.post(`${URL}detallecompra/post`, {
+
+//     })
+//      const detalleCompra = {
+//         descripcion: descripciondecompra,
+//         Id_drogueria: Id_drogueria,
+//         Id_metodoPago: metodopagoseleccionado,
+//         total: totalCompra,
+//         productos: productosCompra, 
+//         nombre_drogueria: nombreDrogueria
+//      }
+//       Swal.fire({
+//       icon: 'success',
+//       title: 'Éxito',
+//       html: `Compra realizada con éxito a <b>${nombreDrogueria}</b>.`,
+//       confirmButtonColor: '#3085d6',
+//       timer: 4500,
+//       timerProgressBar: true,
+//       width: '600px'
+//     }).then(() => {
+//       setProductosCompra([])
+//       limpiarCamposInputs()
+//       handleCloseModalDetalleCompra()
+//       setMetodoPagoSeleccionado('')
+//       generarPDF(detalleCompra)
+//     })   
+//   })
+//   .catch((err) => {
+//     console.error('Error al realizar la compra', err);
+//   })
+// }
