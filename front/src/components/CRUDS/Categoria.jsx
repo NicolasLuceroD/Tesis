@@ -6,6 +6,8 @@ import { faClipboard, faPenToSquare, faTrashAlt} from '@fortawesome/free-regular
 import { Button, ButtonGroup } from "react-bootstrap"
 import { DataContext } from "../../context/DataContext";
 import axios from 'axios'
+import Paginacion from '../Common/Paginacion';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 
 const Categoria = () => {
@@ -19,11 +21,17 @@ const [Id_categoria, setIdCategoria] = useState("")
 const [nombre_categoria, setNombreCategoria] = useState("")
 const [botoneditar, setBotonEditar] = useState(false)
 
+//FILTRO DE BUSQUEDA
+const [buscarcategoria, setBuscarCategoria] = useState("")
+const [ver, setVer] = useState([]);
+
 //OBTENER CATEGORIAS
 const seeCategorias = () => {
     axios.get(`${URL}categoria/verCategoria`).then((response)=> {
         console.log('Categorias: ', response.data)
         setVerCategorias(response.data)
+        setTotal(response.data.length)
+        setVer(response.data)
     })
 }
 
@@ -86,6 +94,25 @@ const limpiarCampos = () => {
     setNombreCategoria("")
 }
 
+
+//PAGINACION
+const categoriasporpagina = 5
+const [actualPagina, setActualPagina] = useState(1)
+const [total, setTotal] = useState(0)
+const ultimoIndex = actualPagina * categoriasporpagina;
+const primerIndex = ultimoIndex - categoriasporpagina;
+
+//FILTRO POR NOMBRE USUARIO
+  const buscador = (e) => {
+    setBuscarCategoria(e.target.value);
+  };
+
+// Filtrar productos
+  const categoriasFiltradas = verCategorias.filter((dato) =>
+    dato.nombre_categoria.toLowerCase().includes(buscarcategoria.toLowerCase())
+  );
+
+
 //MONTAR MIS FUNCIONES
 useEffect(()=>{
     seeCategorias()
@@ -121,10 +148,15 @@ useEffect(()=>{
                 <Button className="me-2" variant="success" onClick={crearCategoria}>GUARDAR</Button>
             )}
         </div>
-
-   
+        <br /><br />
+           <MDBInputGroup className='mb-3'>
+                                    <span className='input-group-text'>
+                                        <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#ff5e5e"}}/>
+                                    </span>
+            <input type="text" placeholder='Busca una categoria...' value={buscarcategoria} onChange={buscador} className='form-control' />
+             </MDBInputGroup> 
 </div>
-
+          
 <br /><br /><br />
     {/* TABLA */}
     <div className="container table">
@@ -139,7 +171,7 @@ useEffect(()=>{
             </tr>
         </thead>
         <tbody>
-            {verCategorias.map((val)=>(
+            {categoriasFiltradas.slice(primerIndex,ultimoIndex).map((val)=>(
                 <tr key={val.Id_categoria}>
                     <td>{val.Id_categoria}</td>
                     <td>{val.nombre_categoria}</td>
@@ -153,6 +185,13 @@ useEffect(()=>{
             ))}
         </tbody>
     </table>
+     <div style={{display:'flex',justifyContent:'center', marginTop: '10px'}}>
+                    <Paginacion productosPorPagina={categoriasporpagina}
+                        actualPagina={actualPagina}
+                        setActualPagina={setActualPagina}
+                        total={total}
+                    />
+    </div>
     </div>
           </div>
         </div>

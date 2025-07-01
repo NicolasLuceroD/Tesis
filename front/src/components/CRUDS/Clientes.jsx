@@ -5,10 +5,11 @@ import App from '../../App'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faCreditCard, faIdCard, faMap, faMoneyBill1, faUser, faUserCircle, faTrashAlt } from '@fortawesome/free-regular-svg-icons'
-import { faHome, faPhone } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import Paginacion from '../Common/Paginacion';
 
 const Clientes = () => {
 
@@ -24,6 +25,10 @@ const [monto_credito, setMontoCredito] = useState('')
 const [limite_credito, setLimiteCredito] = useState('')
 const [botoneditar, setBotonEditar] = useState(false)
 
+//FILTRO BUSCAR CLIENTE
+const [buscarcliente, setBuscarCliente] = useState('')
+const [ver, setVer] = useState([])
+
 //URL
 const { URL } = useContext(DataContext)
 const navigate = useNavigate();
@@ -33,6 +38,8 @@ const seeClientes = () => {
     axios.get(`${URL}clientes/verClientes`).then((response)=> {
         console.log('Clientes: ', response.data)
         setVerClientes(response.data)
+        setVer(response.data)
+        setTotal(response.data.length)
     }).catch((error)=> {
         console.error('Error al traer los clientes', error)
     })
@@ -123,8 +130,6 @@ const limpiarCampos = () => {
 }
 
 
-
-
 //FORMATEO DE MONEDA
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('es-AR', {
@@ -133,6 +138,22 @@ const formatCurrency = (value) => {
     }).format(value);
   };
 
+//PAGINACION
+const clientesporpagina = 5
+const [actualPagina, setActualPagina] = useState(1)
+const [total, setTotal] = useState(0)
+const ultimoIndex = actualPagina * clientesporpagina;
+const primerIndex = ultimoIndex - clientesporpagina;
+
+//FILTRO POR NOMBRE USUARIO
+  const buscador = (e) => {
+    setBuscarCliente(e.target.value);
+  };
+
+// Filtrar productos
+  const clientesFiltrados = verClientes.filter((dato) =>
+    dato.nombre_cliente.toLowerCase().includes(buscarcliente.toLowerCase())
+  );
 
 useEffect(()=> {
     seeClientes()
@@ -221,8 +242,16 @@ useEffect(()=> {
             </>
         )}  
     </div>
+    <div style={{marginTop: '30px'}}>
+        <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+        <input type="text" placeholder='Busca un cliente...' className='form-control' value={buscarcliente} onChange={buscador} />
+        </MDBInputGroup> 
+    </div>
     
-<br /><br /><br />
+
     <div className='container-table'>
         <div className='row'>
             <div className='col'>
@@ -241,7 +270,7 @@ useEffect(()=> {
                         </tr>
                     </thead>
                     <tbody>
-                        {verClientes.map((val)=>(
+                        {clientesFiltrados.slice(primerIndex,ultimoIndex).map((val)=>(
                             <tr key={val.Id_cliente}>
                             <td>{val.Id_cliente}</td>       
                             <td>{val.nombre_cliente}</td>
@@ -261,6 +290,13 @@ useEffect(()=> {
                         ))}
                     </tbody>
                 </table>
+                <div style={{display:'flex',justifyContent:'center', marginTop: '10px'}}>
+                                <Paginacion productosPorPagina={clientesporpagina}
+                                    actualPagina={actualPagina}
+                                    setActualPagina={setActualPagina}
+                                    total={total}
+                                />
+                </div>
             </div>
         </div>
     </div>

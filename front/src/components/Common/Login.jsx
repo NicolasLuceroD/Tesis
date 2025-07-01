@@ -56,17 +56,38 @@ const comprobarLogin = () => {
           const expirationDate = decodedToken.exp * 1000; // Convertimos la expiración a milisegundos
           localStorage.setItem('tokenExpiration', expirationDate); // Guardamos la expiración
 
-          // Redirigir al usuario a la ruta protegida
-          navigate('/venta'); 
-        } else {
-          alert('Credenciales incorrectas'); 
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert('Error al iniciar sesión'); 
+          // Redirigir después de que se cierra la alerta
+          navigate('/venta');
+        
+          // Mostrar alerta de bienvenida
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: `¡Bienvenido, ${usuarioSeleccionado}!`,
+            background: '#e0ffe0',     
+            color: '#205522',        
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Credenciales incorrectas',
+        text: 'Por favor, verifica tu nombre de usuario y contraseña.',
+      });
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al iniciar sesión',
+      text: 'Ocurrió un problema al intentar iniciar sesión. Inténtalo de nuevo más tarde.',
     });
-  }
+  })
+}
 
 useEffect(()=> {
     seeUsuarios()

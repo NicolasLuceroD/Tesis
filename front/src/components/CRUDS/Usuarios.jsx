@@ -5,9 +5,11 @@ import axios from 'axios'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faPenToSquare, faTrashAlt, faUser } from '@fortawesome/free-regular-svg-icons'
-import { faKey, faUserShield, faEyeSlash, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faUserShield, faEyeSlash, faCheck, faSearch } from '@fortawesome/free-solid-svg-icons'
 import {  Button, ButtonGroup, Modal } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'; 
+import Paginacion from '../Common/Paginacion'
+import Swal from 'sweetalert2'
 
 const Usuarios = () => {
 
@@ -21,6 +23,9 @@ const [rol_usuario, setRolUsuario] = useState('0')
 const [botoneditar, setBotonEditar] = useState(false)
 const [mostrarClave, setMostrarClave] = useState(false)
 
+//FILTRO BUSCAR USUARIO
+const [buscarusuario, setBuscarUsuario] = useState('')
+const [ver, setVer] = useState([]);
 
 
 //MODALES
@@ -41,6 +46,8 @@ const seeUsuarios = () => {
     axios.get(`${URL}usuarios/verUsuarios`).then((response)=> {
         console.log(response.data)
         setVerUsuarios(response.data)
+        setVer(response.data)
+        setTotal(response.data.length)
     }).catch((error)=> {
         console.error('Error al obtener usuarios',error)
     })
@@ -60,20 +67,41 @@ const seeUsuariosDadosBaja = () => {
 
 //CREAR USUARIOS
 const crearUsuarios = () => {
-    if(!nombre_usuario || !clave_usuario || rol_usuario === 0) {
-        alert('Debe completar todos los campos')
-        return
-    }
-    axios.post(`${URL}usuarios/post`,
-    {
-        nombre_usuario : nombre_usuario,
-        clave : clave_usuario,
-        rol_usuario : rol_usuario
-    }).then(() => {
-        alert('Usuario creado con exito')
-        seeUsuarios()
-        limpiarCampos()
+  if (!nombre_usuario || !clave_usuario || rol_usuario === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'CAMPOS INCOMPLETOS',
+      text: 'Debe completar todos los campos antes de continuar.',
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: true
     })
+    return
+  }
+axios.post(`${URL}usuarios/post`, {
+    nombre_usuario: nombre_usuario,
+    clave: clave_usuario,
+    rol_usuario: rol_usuario
+  }).then(() => {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Usuario creado con éxito!',
+      html: `El usuario <strong>${nombre_usuario}</strong> ha sido creado con éxito.`,
+      confirmButtonColor: '#3085d6',
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: true
+    })
+    seeUsuarios()
+    limpiarCampos()
+  }).catch((error) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al crear usuario',
+      text: 'Ocurrió un problema al registrar el usuario.',
+    })
+    console.error(error)
+  })
 }
 
 //EDITAR USUARIOS
@@ -84,18 +112,70 @@ const editarUsuarios = () => {
         clave : clave_usuario,
         rol_usuario : rol_usuario
     }).then(()=>{
-        alert('Usuario editado con exito')
+        Swal.fire({
+            icon: 'success',
+            title: 'Usuario editado con éxito',
+            html: `El usuario <strong>${nombre_usuario}</strong> ha sido editado con éxito`,
+            confirmButtonColor: '#3085d6',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: true
+        })
         seeUsuarios()
         limpiarCampos()
     })
 }
 
+//ELIMINAR USUARIOS
+const eliminarUsuario = (val) => {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        html: `¿Deseas eliminar al usuario "<strong>${val.nombre_usuario}</strong>"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.put(`${URL}usuarios/delete/${val.Id_usuario}`)
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario eliminado',
+                    html: `El usuario <strong>${val.nombre_usuario}</strong> fue eliminado correctamente.`,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    showConfirmButton: true
+                })
+                seeUsuarios()
+                seeUsuariosDadosBaja()
+            })
+            .catch((error) => {
+                console.error('Error al borrar usuario', error)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo eliminar el usuario.'
+                })
+            })
+        }
+    })
+}
 
 //DAR DE ALTA A USUARIOS (MODAL)
 const daraltausuarios = (usu) => {
     axios.put(`${URL}usuarios/altausuario/${usu.Id_usuario}`)
         .then(() => {
-            alert('Usuario dado de alta');
+            Swal.fire({
+                icon: 'success',
+                title: 'Usuario dado de alta',
+                html: `El usuario <strong>${usu.nombre_usuario}</strong> ha sido dado de alta nuevamente!.`,
+                timerProgressBar: true,
+                timer: 2500,
+                showConfirmButton: true
+            })
             seeUsuarios()
             seeUsuariosDadosBaja()
         })
@@ -103,19 +183,6 @@ const daraltausuarios = (usu) => {
             console.error('Error al dar de alta el usuario', error);
         });
 }
-
-
-//ELIMINAR USUARIOS
-const eliminarUsuario = (val) => {
-    axios.put(`${URL}usuarios/delete/${val.Id_usuario}`).then(()=> {
-        alert('Usuario eliminado con exito')
-        seeUsuarios()
-        seeUsuariosDadosBaja()
-    }).catch((error)=> {
-        console.error('Error al borrar usuario' ,error)
-    })
-}
-
 //MANEJADOR DE USUARIO
 const hanldeUsuario = (val) => {
     setBotonEditar(true)
@@ -134,7 +201,22 @@ const limpiarCampos = () => {
     setRolUsuario(0)
 }
 
+//PAGINACION
+const usuariosporpagina = 5
+const [actualPagina, setActualPagina] = useState(1)
+const [total, setTotal] = useState(0)
+const ultimoIndex = actualPagina * usuariosporpagina;
+const primerIndex = ultimoIndex - usuariosporpagina;
 
+//FILTRO POR NOMBRE USUARIO
+  const buscador = (e) => {
+    setBuscarUsuario(e.target.value);
+  };
+
+// Filtrar productos
+  const usuariosFiltrados = verUsuarios.filter((dato) =>
+    dato.nombre_usuario.toLowerCase().includes(buscarusuario.toLowerCase())
+  );
 
 useEffect(()=>{
     seeUsuarios()
@@ -189,7 +271,7 @@ useEffect(()=>{
             </Form.Select>
         </MDBInputGroup>
      
-
+    <br />
         {/* BOTONES */}
         <div className='col-12 d-flex justify-content-center'>
             {botoneditar ? (
@@ -201,8 +283,16 @@ useEffect(()=>{
                 <Button className="me-2" variant="success" onClick={crearUsuarios} >GUARDAR</Button>
             )}
         </div>
+        <br />
+         <MDBInputGroup className='mb-3'>
+                        <span className='input-group-text'>
+                            <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#ff5e5e"}}/>
+                        </span>
+        <input type="text" placeholder='Busca un usuario...' className='form-control' value={buscarusuario} onChange={buscador}/> 
+          </MDBInputGroup> 
 </div>
 </div>    
+
 
         {/* TABLA */}
         <br /><br /><br />
@@ -220,7 +310,7 @@ useEffect(()=>{
                     </tr>
                 </thead>
                 <tbody>
-                    {verUsuarios.map((val)=>(
+                    {usuariosFiltrados.slice(primerIndex, ultimoIndex).map((val)=>(
                         <tr key={val.Id_usuario}>
                             <td>{val.Id_usuario}</td>
                             <td>{val.nombre_usuario}</td>
@@ -236,6 +326,13 @@ useEffect(()=>{
                     ))}
                 </tbody>
             </table>
+            <div style={{display:'flex',justifyContent:'center', marginTop: '10px'}}>
+                <Paginacion productosPorPagina={usuariosporpagina}
+                    actualPagina={actualPagina}
+                    setActualPagina={setActualPagina}
+                    total={total}
+                />
+            </div>
             </div>
         </div>
         </div>

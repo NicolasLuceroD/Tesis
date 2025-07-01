@@ -152,7 +152,13 @@ const [total, setTotal] = useState(0)
 const ultimoIndex = actualPagina * productosPorPagina;
 const primerIndex = ultimoIndex - productosPorPagina;
 
-
+//FUNCION PARA PASAR A PESOS ARG
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    }).format(value);
+  };
 
 
 useEffect(()=>{
@@ -317,10 +323,10 @@ useEffect(()=>{
                 <td>{val.Id_producto}</td>
                 <td>{val.codigobarras_producto}</td>
                 <td>{val.nombre_producto}</td>
-                <td><strong>${val.precio_costo}</strong></td>
-                <td><strong>${val.precio_unitario}</strong></td>
-                <td><strong>${val.precio_tira}</strong></td>
-                <td><strong>${val.precio_caja}</strong></td>
+                <td><strong>{formatCurrency(val.precio_costo)}</strong></td>
+                <td><strong>{formatCurrency(val.precio_unitario)}</strong></td>
+                <td><strong>{formatCurrency(val.precio_tira)}</strong></td>
+                <td><strong>{formatCurrency(val.precio_caja)}</strong></td>
                 <td><strong>{parseInt(val.inventario_minimo)}</strong></td>
                 <td>{val.nombre_categoria}</td>
                 <td>{new Date(val.FechaRegistro).toLocaleDateString()}</td>
