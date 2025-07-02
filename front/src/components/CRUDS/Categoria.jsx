@@ -8,6 +8,7 @@ import { DataContext } from "../../context/DataContext";
 import axios from 'axios'
 import Paginacion from '../Common/Paginacion';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 
 
 const Categoria = () => {
@@ -39,14 +40,28 @@ const seeCategorias = () => {
 //CREAR CATEGORIAS
 const crearCategoria = () => {
     if(!nombre_categoria){
-        alert('Debe completar los campos')
+       Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: 'Debe completar todos los campos.',
+        showConfirmButton: true,
+        timer: 2000,
+        timerProgressBar: true
+       })
         return
     }
     axios.post(`${URL}categoria/post`,
     {
         nombre_categoria : nombre_categoria
     }).then(()=> {
-        alert("Categoria creada con exito")
+        Swal.fire({
+         icon: 'success',
+         title: 'Exito!',
+         html: `La categoria <strong>${nombre_categoria}</strong> fue creada con exito!.`,
+         showConfirmButton: true,
+         timer: 2000,
+         timerProgressBar: true
+        })
         seeCategorias()
         limpiarCampos()
     }).catch((error)=>{
@@ -61,7 +76,14 @@ const editarCategoria = () => {
         Id_categoria : Id_categoria,
         nombre_categoria : nombre_categoria
     }).then(()=> {
-        alert("Categoria actualizada con exito")
+        Swal.fire({
+            icon: 'success',
+            title: 'Exito!',
+            html: `La categoria <strong>${nombre_categoria}</strong> fue editada con exito!.`,
+            showConfirmButton: true,
+            timer: 2000,
+            timerProgressBar: true
+        })
         seeCategorias()
         limpiarCampos()
     }).catch((error)=> {
@@ -71,12 +93,39 @@ const editarCategoria = () => {
 
 //ELIMINAR CATEGORIAS
 const eliminarCategoria = (val) => {
-    axios.put(`${URL}categoria/delete/${val.Id_categoria}`).then(()=> {
-        alert("Categoria eliminada con exito")
-        seeCategorias()
-    }).catch((error) => {
-        console.error(error)
-    })
+  Swal.fire({
+    title: '¿Estás seguro?',
+    html: `¿Deseas eliminar la categoría "<strong>${val.nombre_categoria}</strong>"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.put(`${URL}categoria/delete/${val.Id_categoria}`)
+        .then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: '¡Categoría eliminada!',
+            html: `La categoría <strong>${val.nombre_categoria}</strong> fue eliminada correctamente.`,
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: true
+          });
+          seeCategorias();
+        })
+        .catch((error) => {
+          console.error('Error al eliminar la categoría:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar la categoría.',
+          });
+        });
+    }
+  })
 }
 
 //MANEJADOR DE EDICION

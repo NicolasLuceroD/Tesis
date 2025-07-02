@@ -28,7 +28,7 @@ const crearProductos = (req,res) => {
 
 const editarProducto = (req, res) => {
     const Id_producto = req.params.Id_producto
-    const {nombre_producto,precio_unitario,precio_costo,precio_tira,precio_caja,codigobarras_producto,inventario_minimo} = req.body;
+    const {nombre_producto,precio_unitario,precio_costo,precio_tira,precio_caja,codigobarras_producto,inventario_minimo, Id_categoria} = req.body;
     connection.query(
       `UPDATE productos SET 
                           nombre_producto='${nombre_producto}',
@@ -38,7 +38,7 @@ const editarProducto = (req, res) => {
                           precio_caja='${precio_caja}',
                           codigobarras_producto='${codigobarras_producto}',
                           inventario_minimo='${inventario_minimo}',
-                          Id_cateogira='${Id_categoria}'
+                          Id_categoria='${Id_categoria}'
                           WHERE Id_producto = ${Id_producto}`
                           ,(error, results)=>{
                                  if(error)throw error

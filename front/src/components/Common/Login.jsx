@@ -1,7 +1,6 @@
 import { MDBBtn, MDBCard, MDBCardBody, MDBCol, MDBContainer, MDBRow } from 'mdb-react-ui-kit'
 import { useState, useEffect, useContext} from 'react'
 import { DataContext } from '../../context/DataContext'
-import React from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import jwt_decode from 'jwt-decode';
@@ -99,14 +98,13 @@ useEffect(()=> {
 
   return (
     <>
-    
+    <div className="fondo-login"></div>
     <MDBContainer fluid className='d-flex justify-content-center align-items-center min-vh-100'>
         <MDBRow className='w-100'>
             <MDBCol className='d-flex justify-content-center'>
-                <MDBCard className='bg-white my-5 shadow-sm' style={{ borderRadius: '1rem', maxWidth: '500px', padding: '30px' }}>
-              
+                <MDBCard className='bg-white my-5 shadow-sm' style={{ borderRadius: '1rem', maxWidth: '500px', padding: '30px', opacity: 0.87}}>
                     <MDBCardBody className='p-5 w-100 d-flex flex-column rounded-4'>
-                        <img src={logo} alt="" style={{borderRadius: '15px'}}/>
+                        <img src={logo} alt="" style={{borderRadius: '15px', boxShadow: '0 4px 8px rgba(0,0,0, 0.3)' }}/>
                         <br />
                         <select className='form-select mb-4 w-100 rounded-3' value={usuarioSeleccionado} onChange={(e) => setUsuarioSeleccionado(e.target.value)}>
                         <option value="">Seleccione un usuario</option>

@@ -1,12 +1,13 @@
 import { useState, useEffect, useContext} from 'react'
 import App from '../../App'
 import { DataContext } from '../../context/DataContext'
-import { faBarcode, faCalendar, faClipboard, faDollar, faGlassCheers, faPenToSquare, faSearch, faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import { faBarcode, faClipboard, faDollar, faPenToSquare, faSearch, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import Paginacion from "../Common/Paginacion";
+import Swal from 'sweetalert2'
 
 const Productos = () => {
 
@@ -45,8 +46,15 @@ const seeProductos = () =>{
 const crearProductos = () => {
     if(!nombre_producto || !precio_costo || !precio_tira || !precio_unitario || !precio_caja || !inventario_minimo || !codigobarras_producto) 
     {
-        alert('Debe completar todos los campos')
-        return
+       Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia!',
+        text: 'Debe completar todos los campos.',
+        showConfirmButton: true,
+        timerProgressBar: true,
+        timer: 2000
+       })
+       return
     }
   axios.post(`${URL}productos/post`,
     {
@@ -59,7 +67,14 @@ const crearProductos = () => {
       inventario_minimo:inventario_minimo,
       Id_categoria : Id_categoria
     }).then(()=>{
-      alert('producto agregado con exito')
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito!',
+        text: 'Se registro el producto con éxito',
+        showConfirmButton: true,
+        timerProgressBar: true,
+        timer: 2000,
+      })
       seeProductos()
       limpiarCampos()
     })
@@ -79,21 +94,55 @@ const editarProductos = () => {
       inventario_minimo:inventario_minimo,
       Id_categoria : Id_categoria
     }).then(()=>{
-      alert('Producto editado con exito')
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito!',
+        html: `El producto <strong>${nombre_producto}</strong> fue editado con éxito!.`,
+        timerProgressBar: true,
+        timer: 2500,
+        showConfirmButton: true
+      })
       seeProductos()
       limpiarCampos()
   })
 }
 
 //ELIMINAR PRODUCTO
-const eliminarProducto = (val)=>{
-  axios.put(`${URL}productos/delete/${val.Id_producto}`).then(()=>{
-    alert('Producto eliminado con exito')
-    seeProductos()
-  }).catch((error)=>{
-    console.error('Error al borrar usuario',error)
-  })
-}
+const eliminarProducto = (val) => {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    html: `¿Deseas eliminar el producto "<strong>${val.nombre_producto}</strong>"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.put(`${URL}productos/delete/${val.Id_producto}`)
+        .then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Producto eliminado',
+            html: `El producto <strong>${val.nombre_producto}</strong> fue eliminado correctamente.`,
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: true
+          });
+          seeProductos();
+        })
+        .catch((error) => {
+          console.error('Error al borrar usuario', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar el producto.',
+          });
+        });
+    }
+  });
+}; 
 
 //VER CATEGORIAS
 const seeCategorias = () => {

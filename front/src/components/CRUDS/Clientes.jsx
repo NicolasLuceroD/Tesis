@@ -10,6 +10,8 @@ import axios from 'axios';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Paginacion from '../Common/Paginacion';
+import Swal from 'sweetalert2';
+import { icon } from '@fortawesome/fontawesome-svg-core';
 
 const Clientes = () => {
 
@@ -48,7 +50,14 @@ const seeClientes = () => {
 //CREAR CLIENTES
 const crearCliente = () => {
     if(!nombre_cliente || !apellido_cliente || !telefono_cliente || !domicilio_cliente || !documento_cliente || !monto_credito || !limite_credito) {
-        alert('Complete todos los campos')
+         Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Debe completar todos los campos.',
+            showConfirmButton: true,
+            timer: 2000,
+            timerProgressBar: true
+        })
         return
     }
     axios.post(`${URL}clientes/post`,
@@ -61,7 +70,14 @@ const crearCliente = () => {
          monto_credito : monto_credito,
          limite_credito : limite_credito,
         }).then(()=> {
-        alert('Cliente registrado con exito')
+        Swal.fire({
+            icon: 'success',
+            title: 'Exito!',
+            html: `El cliente <strong>${nombre_cliente}</strong> fue creada con exito!.`,
+            showConfirmButton: true,
+            timer: 2000,
+            timerProgressBar: true
+        })
         seeClientes()
         limpiarCampos()
     }).catch((error)=> {
@@ -86,7 +102,14 @@ const editarCliente = () => {
             monto_credito : monto_credito,
             limite_credito : limite_credito,
         }).then(()=> {
-            alert('Cliente actualizado con exito')
+             Swal.fire({
+                icon: 'success',
+                title: 'Exito!',
+                html: `El cliente <strong>${nombre_cliente}</strong> fue editado con exito!.`,
+                showConfirmButton: true,
+                timer: 2000,
+                timerProgressBar: true
+            })
             seeClientes()
             limpiarCampos()
         }).catch((error)=> {
@@ -95,13 +118,40 @@ const editarCliente = () => {
 }
 
 const eliminarCliente = (val) => {
-    axios.put(`${URL}clientes/delete/${val.Id_cliente}`).then(()=> {
-        alert("Cliente eliminado con exito")
-        seeClientes()
-    }).catch((error)=> {
-        console.error(error)
-    })
-}
+  Swal.fire({
+    title: '¿Estás seguro?',
+    html: `¿Deseas eliminar al cliente "<strong>${val.nombre_cliente}</strong>"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.put(`${URL}clientes/delete/${val.Id_cliente}`)
+        .then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: '¡Cliente eliminado!',
+            html: `El cliente <strong>${val.nombre_cliente}</strong> fue eliminado correctamente.`,
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: true
+          });
+          seeClientes();
+        })
+        .catch((error) => {
+          console.error('Error al eliminar cliente:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar el cliente.',
+          });
+        });
+    }
+  });
+};
 
 
 //MANEJADOR DE BOTON EDITAR
