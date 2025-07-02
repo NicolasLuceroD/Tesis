@@ -10,10 +10,13 @@ export const droguerias = '/droguerias'
 export const compra = '/compra'
 export const detallecompra = '/detallecompra'
 
+//REPORTES
+export const reportes = '/reportes'
 
 //STOCK
 export const stock = '/stock'
 
+//OTROS
 export const venta = '/venta'
 export const app = "/app"
 export const login = '/'

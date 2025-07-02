@@ -56,10 +56,14 @@ function App() {
 
   return (
     <>
-      <Navbar className="nobel-navbar" style={{ backgroundColor: '#9e5959' }}>
-  <Container>
-    <Navbar.Brand as={Link} to="/venta">FARMACIA NOBEL</Navbar.Brand>
-    <Nav className="me-auto">
+    <Navbar className="nobel-navbar px-3" style={{ backgroundColor: '#9e5959' }}>
+  <Container fluid className="d-flex justify-content-between align-items-center">
+    <Navbar.Brand as={Link} to="/venta" className="text-white fw-bold me-4">
+      FARMACIA NOBEL
+    </Navbar.Brand>
+
+
+    <Nav className="d-flex align-items-center gap-3 flex-nowrap">
       <Nav.Link as={Link} to="/venta" className="text-white">VENTA</Nav.Link>
       <Nav.Link as={Link} to="/productos" className="text-white">PRODUCTOS</Nav.Link>
       <Nav.Link as={Link} to="/categoria" className="text-white">CATEGORIAS</Nav.Link>
@@ -69,12 +73,16 @@ function App() {
       <Nav.Link as={Link} to="/metodopago" className="text-white">METODO PAGO</Nav.Link>
       <Nav.Link as={Link} to="/stock" className="text-white">STOCK</Nav.Link>
 
-      {/* Desplegable para COMPRAS */}
       <NavDropdown title="COMPRAS" id="nav-dropdown-compras">
         <NavDropdown.Item as={Link} to="/compra">REGISTRAR COMPRA</NavDropdown.Item>
         <NavDropdown.Item as={Link} to="/detallecompra">DETALLE COMPRA</NavDropdown.Item>
       </NavDropdown>
+
+      <NavDropdown title="REPORTES" id="nav-dropdown-reportes">
+        <NavDropdown.Item as={Link} to="/reportes">REPORTE COMPRA</NavDropdown.Item>
+      </NavDropdown>
     </Nav>
+
 
     <Button variant="outline-light" onClick={cerrarTurno}>
       CERRAR TURNO
