@@ -61,7 +61,10 @@ const Compra = () => {
   }
   setShowModalProductos(true);
 }
-  const handleCloseModalProductos = () => setShowModalProductos(false)
+  const handleCloseModalProductos = () => {
+    setShowModalProductos(false)
+    setBuscarProducto('')
+  }
 
   //MODAL DETALLE DE COMPRA
   const [showModalDetalleCompra, setShowModalDetalleCompra] = useState('')
@@ -226,6 +229,7 @@ const agregarProductoACompra = (producto) => {
         nro_lote: ''
       }
     ];
+    setBuscarProducto('')
     console.log("Productos agregados:", nuevosProductos);
     return nuevosProductos;
   });
