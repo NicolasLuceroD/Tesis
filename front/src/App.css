@@ -175,3 +175,41 @@
   z-index: -1;
 }
 
+/* Aplica a todo el sistema */
+::-webkit-scrollbar {
+  width: 10px; /* ancho de la barra vertical */
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a; /* color del fondo */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ff5e5e; /* color de la barra */
+  border-radius: 5px;
+  border: 2px solid transparent;
+}
+
+
+/* Estilo para el dropdown completo */
+.navbar .dropdown-menu {
+  background-color: #f8f9fa; /* fondo claro */
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo de cada ítem */
+.navbar .dropdown-item {
+  color: #212529;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover */
+.navbar .dropdown-item:hover {
+  background-color: #e9ecef;
+  color: #000;
+  border-radius: 5px;
+}
+

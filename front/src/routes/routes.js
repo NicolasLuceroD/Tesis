@@ -16,6 +16,10 @@ export const reportes = '/reportes'
 //STOCK
 export const stock = '/stock'
 
+//CREDITOS
+export const creditosc = '/creditosc'
+export const creditosp = '/creditosp'
+
 //OTROS
 export const venta = '/venta'
 export const app = "/app"

@@ -6,6 +6,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom'; 
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCreditCard, faDoorOpen, faFileAlt, faShoppingCart, faUsers, faBoxOpen, faTags, faUser, faClinicMedical, faTools, faChartPie, faCashRegister, faHandshake } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
 
@@ -64,28 +66,68 @@ function App() {
 
 
     <Nav className="d-flex align-items-center gap-3 flex-nowrap">
-      <Nav.Link as={Link} to="/venta" className="text-white">VENTA</Nav.Link>
-      <Nav.Link as={Link} to="/productos" className="text-white">PRODUCTOS</Nav.Link>
-      <Nav.Link as={Link} to="/categoria" className="text-white">CATEGORIAS</Nav.Link>
-      <Nav.Link as={Link} to="/clientes" className="text-white">CLIENTES</Nav.Link>
-      <Nav.Link as={Link} to="/usuarios" className="text-white">USUARIOS</Nav.Link>
-      <Nav.Link as={Link} to="/droguerias" className="text-white">DROGUERIAS</Nav.Link>
-      <Nav.Link as={Link} to="/metodopago" className="text-white">METODO PAGO</Nav.Link>
-      <Nav.Link as={Link} to="/stock" className="text-white">STOCK</Nav.Link>
+     <Nav.Link as={Link} to="/venta" className="text-white">
+        <FontAwesomeIcon icon={faCashRegister} className="me-2" /> VENTA
+     </Nav.Link>
 
-      <NavDropdown title="COMPRAS" id="nav-dropdown-compras">
-        <NavDropdown.Item as={Link} to="/compra">REGISTRAR COMPRA</NavDropdown.Item>
-        <NavDropdown.Item as={Link} to="/detallecompra">DETALLE COMPRA</NavDropdown.Item>
+      <Nav.Link as={Link} to="/stock" className="text-white">
+        <FontAwesomeIcon icon={faBoxOpen} /> STOCK
+      </Nav.Link>
+
+    {/* DROPDWON DE COMPRAS */}
+     <NavDropdown title={<><FontAwesomeIcon icon={faShoppingCart} className="me-2" />COMPRAS</>} id="nav-dropdown-compras">
+        <NavDropdown.Item as={Link} to="/compra">
+          <FontAwesomeIcon icon={faCashRegister} className="me-2" />
+          REGISTRAR COMPRA
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/detallecompra">
+          <FontAwesomeIcon icon={faFileAlt} className="me-2" />
+          DETALLE COMPRA
+        </NavDropdown.Item>
       </NavDropdown>
 
-      <NavDropdown title="REPORTES" id="nav-dropdown-reportes">
+    {/* DROPDOWN DE CREDITOS */}
+      <NavDropdown title={<><FontAwesomeIcon icon={faCreditCard} className="me-2" />CRÉDITOS</>} id="nav-dropdown-compras">
+        <NavDropdown.Item as={Link} to="/creditosc">
+          <FontAwesomeIcon icon={faUsers} className="me-2" /> CLIENTES
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/creditosp">
+          <FontAwesomeIcon icon={faHandshake} className="me-2" /> PROVEEDORES
+        </NavDropdown.Item>
+      </NavDropdown>
+
+    {/* DROPDOWN DE CRUDS */}
+      <NavDropdown title={<><FontAwesomeIcon icon={faTools} className='me-2'/>CONFIGURACION</>} id="nav-dropdown-configuracion">
+        <NavDropdown.Item as={Link} to="/productos">
+          <FontAwesomeIcon icon={faBoxOpen} /> PRODUCTOS
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/categoria">
+          <FontAwesomeIcon icon={faTags} /> CATEGORIAS
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/usuarios">
+          <FontAwesomeIcon icon={faUsers} /> USUARIOS
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/clientes">
+          <FontAwesomeIcon icon={faUser} /> CLIENTES
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/droguerias">
+          <FontAwesomeIcon icon={faClinicMedical} /> DROGUERIAS
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/metodopago">
+          <FontAwesomeIcon icon={faCreditCard} /> METODOS DE PAGO
+        </NavDropdown.Item>
+      </NavDropdown>
+
+    {/* DROPDOWN DE REPORTES */}
+      <NavDropdown title={<><FontAwesomeIcon icon={faChartPie} className='me-2' />AUDITORIAS</>} id="nav-dropdown-reportes">
         <NavDropdown.Item as={Link} to="/reportes">REPORTE COMPRA</NavDropdown.Item>
       </NavDropdown>
     </Nav>
 
 
     <Button variant="outline-light" onClick={cerrarTurno}>
-      CERRAR TURNO
+      <FontAwesomeIcon icon={faDoorOpen} className="me-2" />
+        CERRAR TURNO
     </Button>
   </Container>
 </Navbar>
