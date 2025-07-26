@@ -18,7 +18,7 @@ const [clienteSeleccionado, setClienteSeleccionado] = useState(1)
 const [metodopagoseleccionado, setMetodopagoseleccionado] = useState('')
 const [buscarproducto, setBuscarProducto] = useState('')
 const [carrito, setCarrito] = useState([])
-const [montoRecibido, setMontoRecibido] = useState('');
+const [montorecibido, setMontoRecibido] = useState('');
 
 //OBTENER EL ID USUARIO QUE VIENE DEL LOCAL STORAGE
 const idUsuario = localStorage.getItem('idUsuario')
@@ -205,7 +205,7 @@ const formatCurrency = (value) => {
   // FILTRAR PRODUCTOS
   const productosFiltrados = productos.filter((dato) =>
     dato.nombre_producto.toLowerCase().includes(buscarproducto.toLowerCase()) ||
-    dato.codigo_barras?.toLowerCase().includes(buscarproducto.toLowerCase())
+    dato.codigobarras_producto?.toLowerCase().includes(buscarproducto.toLowerCase())
   );
 
   //LIMPIAR TODOS LOS CAMPOS AL FINALIZAR LA VENTA
@@ -214,10 +214,11 @@ const formatCurrency = (value) => {
     setMetodopagoseleccionado('')
     setCarrito([])
     verProductos()
+    setMontoRecibido('')
   }
 
   const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
-  const vuelto = montoRecibido ? montoRecibido - totalVenta : 0;
+  const vuelto = montorecibido ? montorecibido - totalVenta : 0;
 
 useEffect(()=>{
   verMetodosPagos()
@@ -307,7 +308,7 @@ useEffect(()=>{
 
       {/* CARD DEL CARRITO */}
           <Card>
-              <Card.Header>Carrito</Card.Header>
+              <Card.Header>Detalle de venta</Card.Header>
               <Card.Body>
                 <Table bordered size="sm">
                   <thead>
@@ -365,16 +366,16 @@ useEffect(()=>{
                 <Form.Label>Monto recibido</Form.Label>
                <Form.Control
                 type="number"
-                placeholder="0.00"
-                value={montoRecibido}
+                placeholder="$0,00"
+                value={montorecibido}
                 onChange={(e) => setMontoRecibido(Number(e.target.value))}
               />
               </Form.Group>
 
               <hr />
 
-              <p>Total: <strong>{formatCurrency(totalVenta)}</strong></p>
-              <p>Vuelto: <strong>{formatCurrency(vuelto >= 0 ? vuelto : 0)}</strong></p>
+              <p className='total'>TOTAL: <strong>{formatCurrency(totalVenta)}</strong></p>
+              <p className='vuelto'>VUELTO: <strong>{formatCurrency(vuelto >= 0 ? vuelto : 0)}</strong></p>
 
               <Button variant="success" size="lg" className="w-100 mt-3" onClick={(FinalizarVenta)}>Finalizar venta</Button>
             </Card.Body>
