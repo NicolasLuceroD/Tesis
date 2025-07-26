@@ -1,9 +1,12 @@
 import { Container, Row, Col, Form, Table, Button, Card } from 'react-bootstrap';
+import { MDBInputGroup } from 'mdb-react-ui-kit';
 import { useState, useEffect, useContext, useRef } from 'react';
 import App from '../App'
 import { DataContext } from '../context/DataContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const Venta = () => {
 
@@ -245,8 +248,19 @@ useEffect(()=>{
           <Card className="mb-3">
             <Card.Header>Búsqueda de productos</Card.Header>
             <Card.Body>
-              <Form.Control type="text" placeholder="Buscar producto o escanear código" value={buscarproducto} onChange={buscador}/>
-              <Table bordered hover size="sm" className="mt-3">
+             <MDBInputGroup className='mb-3'>
+              <span className='input-group-text'>
+                <FontAwesomeIcon icon={faSearch} size="lg" style={{ color: "#0c1596ff" }} />
+              </span>
+              <input
+                className='form-control'
+                type='text'
+                placeholder='Buscar producto o escanear código'
+                value={buscarproducto}
+                onChange={buscador}
+              />
+            </MDBInputGroup>
+              <Table bordered hover size="sm" className="table table-striped table-hover mt-3 shadow-sm custom-table">
                 <thead>
                   <tr>
                     <th>PRODUCTO</th>
@@ -287,14 +301,14 @@ useEffect(()=>{
                           {estaPorVencer && (
                             <div>
                               <small style={{ color: 'red' }}>
-                                ⚠ Lote vence en {diasRestantes} días
+                                ⚠ Lote vence en {diasRestantes} días !.
                               </small>
                             </div>
                           )}
                         </td>
                         <td>{formatCurrency(prod.precio_caja)}</td>
                         <td>
-                          <Button size="sm" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
+                          <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
                             +
                           </Button>
                         </td>
