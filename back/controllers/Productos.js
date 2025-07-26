@@ -58,4 +58,24 @@ const eliminarProductos = (req,res) => {
     )
 }
 
-module.exports={verProductos,crearProductos,editarProducto,eliminarProductos}
+const productosConStock = (req,res) => {
+    connection.query(`SELECT 
+                        l.Id_lote,
+                        l.Id_producto,
+                        p.nombre_producto,
+                        p.codigobarras_producto,
+                        l.cantidad_disponible,
+                        l.fecha_vencimiento,
+                        p.precio_unitario,
+                        p.precio_tira,
+                        p.precio_caja
+                        FROM lotes l
+                        JOIN productos p ON l.Id_producto = p.Id_producto
+                        WHERE l.cantidad_disponible > 0
+                        ORDER BY l.Id_producto, l.fecha_vencimiento ASC`,(error,results) => {
+                            if (error) throw error
+                            res.json(results)
+                        })
+}
+
+module.exports={verProductos,crearProductos,editarProducto,eliminarProductos,productosConStock}

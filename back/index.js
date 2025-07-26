@@ -46,6 +46,7 @@ const DetalleCompra = require('./routes/DetalleCompra')
 const Lotes = require('./routes/Lotes')
 const Stock = require('./routes/Stock')
 const Reportes = require('./routes/Reportes')
+const Venta = require('./routes/Venta')
 
 app.use('/api/categoria', Categoria)
 app.use('/api/clientes', Clientes)
@@ -59,6 +60,7 @@ app.use('/api/detallecompra', DetalleCompra)
 app.use('/api/lote', Lotes)
 app.use('/api/stock', Stock)
 app.use('/api/reportes', Reportes)
+app.use('/api/venta', Venta)
 
 app.listen(3001)
 

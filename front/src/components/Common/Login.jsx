@@ -48,6 +48,7 @@ const comprobarLogin = () => {
           // Guardamos el token en el localStorage
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('nombreUsuario', usuarioSeleccionado);
+          localStorage.setItem('idUsuario', response.data.usuario.id);
           console.log("Token guardado:", response.data.token);
           
           // Decodificar el token para obtener la fecha de expiración
