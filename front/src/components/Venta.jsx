@@ -6,7 +6,8 @@ import { DataContext } from '../context/DataContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import Paginacion from './Common/Paginacion';
 
 const Venta = () => {
 
@@ -22,6 +23,7 @@ const [metodopagoseleccionado, setMetodopagoseleccionado] = useState('')
 const [buscarproducto, setBuscarProducto] = useState('')
 const [carrito, setCarrito] = useState([])
 const [montorecibido, setMontoRecibido] = useState('');
+const [ver, setVer] = useState([]);
 
 //OBTENER EL ID USUARIO QUE VIENE DEL LOCAL STORAGE
 const idUsuario = localStorage.getItem('idUsuario')
@@ -49,6 +51,7 @@ const verProductos = () => {
     .then((response) => {
       const agrupados = agruparProductosPorLote(response.data);
       setProductos(agrupados);
+      setTotal(response.data.length)
     })
     .catch((err) => {
       console.error('Error al traer productos con lotes', err);
@@ -149,11 +152,7 @@ const agregarAlCarrito = (producto) => {
 
   const stockDisponible = loteCercano.cantidad_disponible; 
 
-  const existe = carrito.find(
-    (item) =>
-      item.Id_producto === producto.Id_producto &&
-      item.lote.Id_lote === loteCercano.Id_lote
-  );
+  const existe = carrito.find((item) => item.Id_producto === producto.Id_producto && item.lote.Id_lote === loteCercano.Id_lote);
 
   if (existe) {
     if (existe.cantidad < stockDisponible) {
@@ -223,6 +222,13 @@ const formatCurrency = (value) => {
   const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
   const vuelto = montorecibido ? montorecibido - totalVenta : 0;
 
+//PAGINACION
+  const productosPorPagina = 5
+  const [actualPagina, setActualPagina] = useState(1)
+  const [total, setTotal] = useState(0)
+  const ultimoIndex = actualPagina * productosPorPagina;
+  const primerIndex = ultimoIndex - productosPorPagina;
+
 useEffect(()=>{
   verMetodosPagos()
   verClientes()
@@ -234,97 +240,113 @@ useEffect(()=>{
 
   return (
     <>
-        <App/>
-        <div className='h3-subtitulos'>
-            <h3>VENTA</h3>
-        </div>
+  <App />
+  <div className="h3-subtitulos">
+    <h3>VENTA</h3>
+  </div>
 
-   <Container fluid className="mt-4">
-      <Row>
-        {/* Columna izquierda: búsqueda + carrito */}
-        <Col md={8}>
+  <Container fluid className="mt-4">
+    <Row>
+      {/* Sección principal: productos + carrito */}
+      <Col md={8}>
+        <Row>
+          {/* Búsqueda de productos */}
+          <Col md={7}>
+            <Card className="mb-3">
+              <Card.Header>Búsqueda de productos</Card.Header>
+              <Card.Body>
+                <MDBInputGroup className="mb-3">
+                  <span className="input-group-text">
+                    <FontAwesomeIcon icon={faSearch} size="lg" style={{ color: "#4b6cb7" }} />
+                  </span>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Buscar producto o escanear código"
+                    value={buscarproducto}
+                    onChange={buscador}
+                  />
+                </MDBInputGroup>
 
-      {/* CARD DE LA BUSQUEDA DE PRODUCTOS */}
-          <Card className="mb-3">
-            <Card.Header>Búsqueda de productos</Card.Header>
-            <Card.Body>
-             <MDBInputGroup className='mb-3'>
-              <span className='input-group-text'>
-                <FontAwesomeIcon icon={faSearch} size="lg" style={{ color: "#0c1596ff" }} />
-              </span>
-              <input
-                className='form-control'
-                type='text'
-                placeholder='Buscar producto o escanear código'
-                value={buscarproducto}
-                onChange={buscador}
-              />
-            </MDBInputGroup>
-              <Table bordered hover size="sm" className="table table-striped table-hover mt-3 shadow-sm custom-table">
-                <thead>
-                  <tr>
-                    <th>PRODUCTO</th>
-                    <th>PRECIO</th>
-                    <th>ACCION</th>
-                  </tr>
-                </thead>
-               <tbody>
-                  {productosFiltrados.map((prod) => {
-                    const loteCercano = prod.lotes.reduce((prev, curr) =>
-                      new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
-                    );
+                <Table bordered hover size="sm" className="table table-striped table-hover mt-3 shadow-sm custom-table">
+                  <thead>
+                    <tr>
+                      <th>PRODUCTO</th>
+                      <th>PRECIO</th>
+                      <th>ACCIÓN</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productosFiltrados.slice(primerIndex, ultimoIndex).map((prod) => {
+                      const loteCercano = prod.lotes.reduce((prev, curr) =>
+                        new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
+                      );
 
-                    const hoy = new Date();
-                    const vto = new Date(loteCercano.fecha_vencimiento);
-                    const diasRestantes = Math.ceil((vto - hoy) / (1000 * 60 * 60 * 24));
-                    const estaPorVencer = diasRestantes <= 5;
+                      const hoy = new Date();
+                      const vto = new Date(loteCercano.fecha_vencimiento);
+                      const diasRestantes = Math.ceil((vto - hoy) / (1000 * 60 * 60 * 24));
+                      const estaPorVencer = diasRestantes <= 5;
 
-                    return (
-                      <tr key={prod.Id_producto} className={estaPorVencer ? 'table-warning' : ''}>
-                        <td>
-                          <strong>{prod.nombre_producto}</strong><br />
-                          <small>Código: {prod.codigobarras_producto}</small><br />
-                          <small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small><br />
-                          <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
-                           {/* 🔶 Aviso si hay otro lote posterior */}
+                      return (
+                        <tr key={prod.Id_producto} className={estaPorVencer ? "table-warning" : ""}>
+                          <td>
+                            <strong>{prod.nombre_producto}</strong><br />
+                            <small>Código: {prod.codigobarras_producto}</small><br />
+                            <small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small><br />
+                            <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
+
                             {prod.lotes.some(l => new Date(l.fecha_vencimiento) > new Date(loteCercano.fecha_vencimiento)) && (
-                              <small style={{ color: 'green', fontWeight: 'bold' }}>
-                                📦 Hay mas stock en otro lote, no te preocupes!.
+                              <small style={{ color: "green", fontWeight: "bold" }}>
+                                📦 Hay más stock en otro lote, no te preocupes!
                               </small>
                             )}
-                             {/* No hay más stock en otros lotes */}
-                              {!prod.lotes.some(l => l.Id_lote !== loteCercano.Id_lote && l.cantidad_disponible > 0) && (
-                                <small style={{ color: 'red', fontWeight: 'bold' }}>
-                                  ⚠️ Este es el unico lote con stock. Debes comprar!
-                                </small>
-                              )}
-                          {estaPorVencer && (
-                            <div>
-                              <small style={{ color: 'red' }}>
-                                ⚠ Lote vence en {diasRestantes} días !.
-                              </small>
-                            </div>
-                          )}
-                        </td>
-                        <td>{formatCurrency(prod.precio_caja)}</td>
-                        <td>
-                          <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
-                            +
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
 
-      {/* CARD DEL CARRITO */}
-          <Card>
-              <Card.Header>Detalle de venta</Card.Header>
+                            {!prod.lotes.some(l => l.Id_lote !== loteCercano.Id_lote && l.cantidad_disponible > 0) && (
+                              <small style={{ color: "red", fontWeight: "bold" }}>
+                                ⚠️ Este es el único lote con stock. ¡Debes comprar!
+                              </small>
+                            )}
+
+                            {estaPorVencer && (
+                              <div>
+                                <small style={{ color: "red" }}>
+                                  ⚠ Lote vence en {diasRestantes} días!
+                                </small>
+                              </div>
+                            )}
+                          </td>
+                          <td>{formatCurrency(prod.precio_caja)}</td>
+                          <td>
+                            <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
+                              +
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+
+                <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
+                  <Paginacion
+                    productosPorPagina={productosPorPagina}
+                    actualPagina={actualPagina}
+                    setActualPagina={setActualPagina}
+                    total={total}
+                  />
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+
+          {/* Detalle del carrito */}
+          <Col md={5}>
+            <Card>
+             <Card.Header>
+                <FontAwesomeIcon icon={faShoppingCart} /> Detalle de venta
+            </Card.Header>
               <Card.Body>
-                <Table bordered size="sm">
+                <Table bordered size="sm" className="table table-striped table-hover mt-3 shadow-sm custom-table">
                   <thead>
                     <tr>
                       <th>PRODUCTO</th>
@@ -346,59 +368,62 @@ useEffect(()=>{
                 </Table>
               </Card.Body>
             </Card>
-        </Col>
+          </Col>
+        </Row>
+      </Col>
 
-        {/* COLUMNA DE RESUMEN Y PAGO */}
-        <Col md={4}>
-          <Card>
-            <Card.Header>Resumen y Pago</Card.Header>
-            <Card.Body>
-              <Form.Group className="mb-3">
-                <Form.Label>Cliente</Form.Label>
-               <Form.Select value={clienteSeleccionado} onChange={(e) => setClienteSeleccionado(e.target.value)}>
-                  {clientes.map((cl) => (
-                    <option key={cl.Id_cliente} value={cl.Id_cliente}>
-                      {cl.nombre_cliente}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+      {/* Resumen y pago */}
+      <Col md={4}>
+        <Card>
+          <Card.Header>Resumen y Pago</Card.Header>
+          <Card.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Cliente</Form.Label>
+              <Form.Select value={clienteSeleccionado} onChange={(e) => setClienteSeleccionado(e.target.value)}>
+                {clientes.map((cl) => (
+                  <option key={cl.Id_cliente} value={cl.Id_cliente}>
+                    {cl.nombre_cliente}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Método de pago</Form.Label>
-                <Form.Select value={metodopagoseleccionado} onChange={(e) => setMetodopagoseleccionado(e.target.value)}>
-                  <option value= ''>Seleccione</option>
-                  {metodospago.map((mp) => (
-                    <option key={mp.Id_metodoPago} value={mp.Id_metodoPago}>
-                      {mp.nombre_metodopago}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Método de pago</Form.Label>
+              <Form.Select value={metodopagoseleccionado} onChange={(e) => setMetodopagoseleccionado(e.target.value)}>
+                <option value="">Seleccione</option>
+                {metodospago.map((mp) => (
+                  <option key={mp.Id_metodoPago} value={mp.Id_metodoPago}>
+                    {mp.nombre_metodopago}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Monto recibido</Form.Label>
-               <Form.Control
+            <Form.Group className="mb-3">
+              <Form.Label>Monto recibido</Form.Label>
+              <Form.Control
                 type="number"
                 placeholder="$0,00"
                 value={montorecibido}
                 onChange={(e) => setMontoRecibido(Number(e.target.value))}
               />
-              </Form.Group>
+            </Form.Group>
 
-              <hr />
+            <hr />
 
-              <p className='total'>TOTAL: <strong>{formatCurrency(totalVenta)}</strong></p>
-              <p className='vuelto'>VUELTO: <strong>{formatCurrency(vuelto >= 0 ? vuelto : 0)}</strong></p>
+            <p className="total">TOTAL: <strong>{formatCurrency(totalVenta)}</strong></p>
+            <p className="vuelto">VUELTO: <strong>{formatCurrency(vuelto >= 0 ? vuelto : 0)}</strong></p>
 
-              <Button variant="success" size="lg" className="w-100 mt-3" onClick={(FinalizarVenta)}>Finalizar venta</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
-
-    </>
+            <Button variant="success" size="lg" className="w-100 mt-3" onClick={FinalizarVenta}>
+              Finalizar venta
+            </Button>
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Container>
+</>
   )
 }
 

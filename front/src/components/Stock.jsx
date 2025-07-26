@@ -22,10 +22,10 @@ const [ver, setVer] = useState([]);
 
 const verStock = () => {
     axios.get(`${URL}stock/verStock`).then((response)=> {
-        console.log('Stock: ', response.data)
-        setStock(response.data)
-        setVer(response.data)
-        setTotal(response.data.length)
+        const stockFormateado = transformarStock(response.data);
+        setStock(stockFormateado)
+        setVer(stockFormateado)
+        setTotal(stockFormateado.length)
     }).catch((err)=> {
         console.error('Error al traer stock', err)
     })
@@ -48,6 +48,17 @@ const [total, setTotal] = useState(0)
 const ultimoIndex = actualPagina * productosPorPagina;
 const primerIndex = ultimoIndex - productosPorPagina;
 
+
+const transformarStock = (datos) => {
+  return Object.entries(datos).map(([nombre_producto, data]) => ({
+    Id_producto: data.Id_producto,
+    nombre_producto,
+    total_disponible: data.total,
+    detalle_fechas: data.detalle_fechas
+  }));
+};
+
+
 useEffect(()=>{
     verStock()
 },[])
@@ -64,28 +75,56 @@ useEffect(()=>{
     <br /><br />
          <MDBInputGroup className='mb-3'>
                 <span className='input-group-text'>
-                    <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#ff5e5e"}}/>
+                    <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#4b6cb7"}}/>
                 </span>
               <input className='form-control' type="text" placeholder='Busca un producto...' value={buscarproducto} onChange={buscador} /><br />
           </MDBInputGroup>
    
-    <table className='custom-table'>
-        <thead>
-            <tr>
+   <table className='custom-table'>
+       <thead>
+          <tr>
             <th>FOLIO</th>
             <th>PRODUCTO</th>
             <th>TOTAL DISPONIBLE</th>
-            </tr>
+            <th>FECHAS DE VENCIMIENTO</th>
+            <th>UNIDADES</th>
+            <th>NRO DE LOTE</th>
+          </tr>
         </thead>
         <tbody>
-           {productosFiltrados.slice(primerIndex,ultimoIndex).map((val)=> (
+          {productosFiltrados.slice(primerIndex, ultimoIndex).map((val) => (
             <tr key={val.Id_producto}>
-            <td>{val.Id_producto}</td>
-            <td>{val.nombre_producto}</td>
-            <td>{val.total_disponible}</td>
+              <td>{val.Id_producto}</td>
+              <td>{val.nombre_producto}</td>
+              <td>{val.total_disponible}</td>
+
+            <td>
+              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                {val.detalle_fechas.map((detalle, i) => (
+                  <li key={i}>{new Date(detalle.fecha_vencimiento).toLocaleDateString()}</li>
+                ))}
+              </ul>
+            </td>
+
+            <td>
+              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                {val.detalle_fechas.map((detalle, i) => (
+                  <li key={i}>{detalle.cantidad}</li>
+                ))}
+              </ul>
+            </td>
+
+
+              <td>
+                <ul style={{margin: 0, paddingLeft: '1rem'}}>
+                  {val.detalle_fechas.map((detalle, i) => (
+                  <li key={i}>{detalle.nro_lote}</li>
+                  ))}
+                </ul>
+              </td>
             </tr>
-           ))}
-        </tbody>
+          ))}
+</tbody>
     </table>
             <div style={{display:'flex',justifyContent:'center', marginTop: '10px'}}>
                 <Paginacion productosPorPagina={productosPorPagina}
