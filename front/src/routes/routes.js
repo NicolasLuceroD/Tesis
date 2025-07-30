@@ -21,7 +21,10 @@ export const creditosc = '/creditosc'
 export const creditosp = '/creditosp'
 
 //OTROS
-export const venta = '/venta'
 export const app = "/app"
 export const login = '/'
+
+//VENTA Y DETALLE VENTA
+export const venta = '/venta'
+export const detalleventa = '/detalleventa'
 

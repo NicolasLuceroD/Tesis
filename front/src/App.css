@@ -231,3 +231,8 @@
   padding-bottom: 4px;
   font-family: 'Courier New', Courier, monospace;
 }
+
+.columna-detallev-usuario {
+  background-color: #4b6bb7da;
+  width: 200px;
+}

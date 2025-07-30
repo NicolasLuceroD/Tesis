@@ -1,13 +1,13 @@
 import { Container, Row, Col, Form, Table, Button, Card } from 'react-bootstrap';
 import { MDBInputGroup } from 'mdb-react-ui-kit';
 import { useState, useEffect, useContext, useRef } from 'react';
-import App from '../App'
-import { DataContext } from '../context/DataContext';
+import App from '../../App'
+import { DataContext } from '../../context/DataContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import Paginacion from './Common/Paginacion';
+import Paginacion from '../Common/Paginacion';
 
 const Venta = () => {
 
@@ -70,6 +70,8 @@ const agruparProductosPorLote = (data) => {
         nombre_producto: item.nombre_producto,
         codigobarras_producto: item.codigobarras_producto,
         precio_caja: item.precio_caja,
+        precio_tira: item.precio_tira,     
+        precio_unitario: item.precio_unitario, 
         lotes: [item],
       });
     }
@@ -178,8 +180,12 @@ const agregarAlCarrito = (producto) => {
       const nuevoItem = {
         Id_producto: producto.Id_producto,
         nombre_producto: producto.nombre_producto,
-        precio: producto.precio_caja,
+        precio: 0,
+        precio_caja: producto.precio_caja,
+        precio_tira: producto.precio_tira,
+        precio_unitario: producto.precio_unitario,
         cantidad: 1,
+        tipoPrecio: "",
         lote: loteCercano,
       };
       setCarrito([...carrito, nuevoItem]);
@@ -187,6 +193,31 @@ const agregarAlCarrito = (producto) => {
       alert("Este lote no tiene stock disponible.");
     }
   }
+};
+
+const cambiarTipoPrecio = (index, nuevoTipo) => {
+  const nuevoCarrito = [...carrito];
+  const item = nuevoCarrito[index];
+
+  let nuevoPrecio;
+
+  switch (nuevoTipo) {
+    case "unidad":
+      nuevoPrecio = item.precio_unitario;
+      break;
+    case "tira":
+      nuevoPrecio = item.precio_tira;
+      break;
+    case "caja":
+    default:
+      nuevoPrecio = item.precio_caja;
+      break;
+  }
+
+  item.tipoPrecio = nuevoTipo;
+  item.precio = nuevoPrecio;
+
+  setCarrito(nuevoCarrito);
 };
 
 
@@ -251,7 +282,7 @@ useEffect(()=>{
       <Col md={8}>
         <Row>
           {/* Búsqueda de productos */}
-          <Col md={7}>
+          <Col md={5}>
             <Card className="mb-3">
               <Card.Header>Búsqueda de productos</Card.Header>
               <Card.Body>
@@ -281,7 +312,6 @@ useEffect(()=>{
                       const loteCercano = prod.lotes.reduce((prev, curr) =>
                         new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
                       );
-
                       const hoy = new Date();
                       const vto = new Date(loteCercano.fecha_vencimiento);
                       const diasRestantes = Math.ceil((vto - hoy) / (1000 * 60 * 60 * 24));
@@ -294,6 +324,7 @@ useEffect(()=>{
                             <small>Código: {prod.codigobarras_producto}</small><br />
                             <small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small><br />
                             <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
+                            <small>Lote: {loteCercano.nro_lote}</small><br />
 
                             {prod.lotes.some(l => new Date(l.fecha_vencimiento) > new Date(loteCercano.fecha_vencimiento)) && (
                               <small style={{ color: "green", fontWeight: "bold" }}>
@@ -340,7 +371,7 @@ useEffect(()=>{
           </Col>
 
           {/* Detalle del carrito */}
-          <Col md={5}>
+          <Col md={7}>
             <Card>
              <Card.Header>
                 <FontAwesomeIcon icon={faShoppingCart} /> Detalle de venta
@@ -352,6 +383,7 @@ useEffect(()=>{
                       <th>PRODUCTO</th>
                       <th>CANTIDAD</th>
                       <th>PRECIO</th>
+                      <th>TIPO PRECIO</th>
                       <th>SUBTOTAL</th>
                     </tr>
                   </thead>
@@ -360,8 +392,22 @@ useEffect(()=>{
                       <tr key={index}>
                         <td>{item.nombre_producto}</td>
                         <td>{item.cantidad}</td>
-                        <td>{formatCurrency(item.precio)}</td>
-                        <td>{formatCurrency(item.precio * item.cantidad)}</td>
+                        <td>{item.precio > 0 ? formatCurrency(item.precio) : '-'}</td>
+                        <td>
+                          <Form.Select
+                            size="sm"
+                            value={item.tipoPrecio || ""}
+                            onChange={(e) => cambiarTipoPrecio(index, e.target.value)}
+                          >
+                            <option value="" disabled>
+                              Seleccione tipo de precio
+                            </option>
+                            {item.precio_unitario > 0 && <option value="unidad">Unidad</option>}
+                            {item.precio_tira > 0 && <option value="tira">Tira</option>}
+                            {item.precio_caja > 0 && <option value="caja">Caja</option>}
+                          </Form.Select>
+                        </td>
+                        <td><b>{formatCurrency(item.precio * item.cantidad)}</b></td>
                       </tr>
                     ))}
                   </tbody>

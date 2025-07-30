@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes} from 'react-router-dom'
 
 //IMPORTO MIS RUTAS
-import { categoria, app, clientes, metodopago, usuarios, venta, productos, droguerias,compra, detallecompra, stock, reportes, creditosc, creditosp} from './routes/routes.js'
+import { categoria, app, clientes, metodopago, usuarios, venta, productos, droguerias,compra, detallecompra, stock, reportes, creditosc, creditosp, detalleventa} from './routes/routes.js'
 
 //IMPORTO SUS COMPONENTES
 import Categoria from './components/CRUDS/Categoria.jsx'
@@ -12,7 +12,8 @@ import Clientes from './components/CRUDS/Clientes.jsx'
 import MetodoPago from './components/CRUDS/MetodoPago.jsx'
 import Usuarios from './components/CRUDS/Usuarios.jsx'
 import Login from './components/Common/Login.jsx'
-import Venta from './components/Venta.jsx'
+import Venta from './components/Ventas/Venta.jsx'
+import DetalleVenta from './components/Ventas/DetalleVenta.jsx'
 import App from './App.jsx'
 import DataProvider from "./context/DataProvider.jsx"; 
 import Productos from './components/CRUDS/Productos.jsx'
@@ -37,7 +38,8 @@ createRoot(document.getElementById('root')).render(
           <Route path={clientes} element={<Clientes/>}/>        
           <Route path={metodopago} element={<MetodoPago/>}/>        
           <Route path={usuarios} element={<Usuarios/>}/>        
-          <Route path={venta} element={<Venta/>}/>        
+          <Route path={venta} element={<Venta/>}/>       
+          <Route path={detalleventa} element={<DetalleVenta/>}/>       
           <Route path={productos} element={<Productos/>}/>        
           <Route path={droguerias} element={<Droguerias/>}/>        
           <Route path={compra} element={<Compra/>}/>        

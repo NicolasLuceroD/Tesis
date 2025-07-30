@@ -66,6 +66,7 @@ const productosConStock = (req,res) => {
                         p.codigobarras_producto,
                         l.cantidad_disponible,
                         l.fecha_vencimiento,
+                        l.nro_lote,
                         p.precio_unitario,
                         p.precio_tira,
                         p.precio_caja

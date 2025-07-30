@@ -15,7 +15,7 @@ const DetalleCompra = () => {
 const { URL } = useContext(DataContext)
 
 //ESTADOS
-const [detallecompra, setDetalleCompra] = useState([])
+const [detalleventa, setDetalleVenta] = useState([])
 const [ver, setVer] = useState([]);
 const [buscardetalle, setBuscarDetalle] = useState('')
 
@@ -24,9 +24,9 @@ const [buscardetalle, setBuscarDetalle] = useState('')
 
 //TRAER DETALLES COMPRA COMPLETOS
 const verDetalleCompraCompleto = () => {
-    axios.get(`${URL}detallecompra/verDetalleCompraCompleto`).then((response) => {
-        console.log('Detalle de compra: ', response.data)
-        setDetalleCompra(response.data)
+    axios.get(`${URL}detalleventa/verDetalleVentaCompletoAgrupado`).then((response) => {
+        console.log('Detalle de venta: ', response.data)
+        setDetalleVenta(response.data)
         setVer(response.data)
         setTotal(response.data.length)
     }).catch((err) => {
@@ -49,7 +49,7 @@ const verDetalleCompraCompleto = () => {
   };
 
 // Filtrar detalle
-  const detallesFiltrados = detallecompra.filter((dato) => {
+  const detallesFiltrados = detalleventa.filter((dato) => {
     const fechaFormateada = new Date(dato.fecha_registro).toLocaleDateString(); //esto me lo convierte solo a fecha mes y año sacando la hora y minutos
     return fechaFormateada.includes(buscardetalle)
   });
@@ -72,10 +72,10 @@ useEffect(()=>{
     <>
     <App/>
      <div className="h3-subtitulos">
-        <h3>DETALLE COMPRA</h3>
+        <h3>DETALLE VENTA</h3>
     </div><br />
      <h2 className="text-center">
-        VISUALIZA LOS DETALLES DE COMPRA COMPLETOS.
+        VISUALIZA LOS DETALLES DE VENTA COMPLETOS.
     </h2>
 
 <br />
@@ -99,21 +99,21 @@ useEffect(()=>{
       <th>FOLIO</th>
       <th>PRODUCTO</th>
       <th>CANTIDAD</th>
-      <th>PRECIO COSTO</th>
       <th>TOTAL</th>
+      <th>USUARIO QUE REGISTRO LA VENTA</th>
       <th>FECHA REGISTRO</th>
     </tr>
   </thead>
   <tbody>
-    {detallesFiltrados.slice(primerIndex,ultimoIndex).map((compra) => (
-      <tr key={compra.Id_compra}>
-        <td>{compra.Id_compra}</td>
+    {detallesFiltrados.slice(primerIndex,ultimoIndex).map((venta) => (
+      <tr key={venta.Id_venta}>
+        <td>{venta.Id_venta}</td>
 
         {/* Lista de productos */}
         <td>
           <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
-            {compra.productos.map((prod) => (
-              <li key={prod.Id_detalleCompra}>{prod.nombre_producto}</li>
+            {venta.productos.map((prod) => (
+              <li key={prod.Id_detalleventa}>{prod.nombre_producto}</li>
             ))}
           </ul>
         </td>
@@ -121,29 +121,30 @@ useEffect(()=>{
         {/* Lista de cantidades */}
         <td>
           <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
-            {compra.productos.map((prod) => (
-              <li key={prod.Id_detalleCompra}>{prod.Cantidad}</li>
+            {venta.productos.map((prod) => (
+              <li key={prod.Id_detalleventa}>{parseInt(prod.cantidadVendida)}</li>
             ))}
           </ul>
         </td>
 
         {/* Lista de precios */}
-        <td>
+        {/* <td>
           <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
-            {compra.productos.map((prod) => (
-              <li key={prod.Id_detalleCompra}>
+            {venta.productos.map((prod) => (
+              <li key={prod.Id_detalleventa}>
                 {formatCurrency(prod.Precio_costo)}
               </li>
             ))}
           </ul>
-        </td>
-
+        </td> */}
         <td data-label="Total" style={{ fontWeight: "700", color: "#182848" }}>
-          {formatCurrency(compra.precio_total)}
+          {formatCurrency(venta.precio_total)}
         </td>
 
+         <td className='columna-detallev-usuario'>{venta.usuario}</td>
+         
         {/* Lista de fechas */}
-          <td>{new Date(compra.fecha_registro).toLocaleString()}</td>
+          <td>{new Date(venta.fecha_registro).toLocaleString()}</td>
       </tr>
     ))}
   </tbody>

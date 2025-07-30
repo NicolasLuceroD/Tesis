@@ -68,9 +68,16 @@ function App() {
 
 
     <Nav className="d-flex align-items-center gap-3 flex-nowrap">
-     <Nav.Link as={Link} to="/venta" className="text-white">
-        <FontAwesomeIcon icon={faCashRegister} className="me-2" /> VENTA
-     </Nav.Link>
+      <NavDropdown title={<><FontAwesomeIcon icon={faShoppingCart} className="me-2" />VENTAS Y DETALLE</>} id="nav-dropdown-ventas">
+        <NavDropdown.Item as={Link} to="/venta">
+          <FontAwesomeIcon icon={faCashRegister} className="me-2" />
+          REGISTRAR VENTA
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/detalleventa">
+          <FontAwesomeIcon icon={faFileAlt} className="me-2" />
+          DETALLE VENTA
+        </NavDropdown.Item>
+      </NavDropdown>
 
       <Nav.Link as={Link} to="/stock" className="text-white">
         <FontAwesomeIcon icon={faBoxOpen} /> STOCK
