@@ -275,10 +275,15 @@ useEffect(()=>{
   <div className="h3-subtitulos">
     <h3>VENTA</h3>
   </div>
-   <div style={{ marginTop: '10px', marginLeft: '20px' }}>
-    <a href="https://www.misvalidaciones.com.ar/" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-      <FontAwesomeIcon icon={faFilePrescription} className="me-1" />
-      Valida tus recetas aqui.
+   <div className="validaciones">
+    <a
+      href="https://www.misvalidaciones.com.ar/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="link-validacion"
+    >
+      <FontAwesomeIcon icon={faFilePrescription} className="me-2" />
+      ⚠️ Validá tus recetas aquí.
     </a>
   </div>
 

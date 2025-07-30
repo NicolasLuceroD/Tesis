@@ -236,3 +236,19 @@
   background-color: #4b6bb7da;
   width: 200px;
 }
+
+.validaciones{
+  margin: 10px 20px;
+  padding: 10px 15px;
+  background-color: #b4ffbe;
+  border-left: 5px solid #4ffa5d;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.validaciones .link-validacion {
+  text-decoration: none;
+  color: #070707;
+}

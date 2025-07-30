@@ -21,6 +21,16 @@ export const generarPDF = (detalleCompra) => {
 
   // Título centrado
   const titulo = 'DETALLE DE COMPRA';
+  const direccionFarmacia = 'San Martín 102 - Lules ';
+  const codigoPostal = 'CP - 4000';
+  const fechaHora = new Date().toLocaleString('es-AR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+});
+
   doc.setFontSize(20);
   doc.setTextColor(40, 40, 40);
   const textWidth = doc.getTextWidth(titulo);
@@ -45,6 +55,12 @@ export const generarPDF = (detalleCompra) => {
   doc.text(`Dirección: ${detalleCompra.direccion}`, 14, y); y += lineSpacing;
   doc.text(`Correo: ${detalleCompra.correo}`, 14, y); y += lineSpacing;
   doc.text(`CUIT: ${detalleCompra.cuit}`, 14, y); y += lineSpacing;
+
+  doc.text(`Farmacia Nobel`, pageWidth - 14, 12, { align: 'right' });
+  doc.text(`Dirección: ${direccionFarmacia}`, pageWidth - 14, 17, { align: 'right' });
+  doc.text(`Código Postal: ${codigoPostal}`, pageWidth - 14, 22, { align: 'right' });
+  doc.text(`Fecha y hora: ${fechaHora}`, pageWidth - 14, 27, { align: 'right' });
+
 
   // Tabla de productos
   autoTable(doc, {
