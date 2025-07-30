@@ -6,7 +6,7 @@ import { DataContext } from '../../context/DataContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faFilePrescription, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import Paginacion from '../Common/Paginacion';
 
 const Venta = () => {
@@ -274,6 +274,12 @@ useEffect(()=>{
   <App />
   <div className="h3-subtitulos">
     <h3>VENTA</h3>
+  </div>
+   <div style={{ marginTop: '10px', marginLeft: '20px' }}>
+    <a href="https://www.misvalidaciones.com.ar/" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+      <FontAwesomeIcon icon={faFilePrescription} className="me-1" />
+      Valida tus recetas aqui.
+    </a>
   </div>
 
   <Container fluid className="mt-4">

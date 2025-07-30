@@ -16,6 +16,7 @@ const { URL } = useContext(DataContext)
 
 //ESTADOS
 const [detalleventa, setDetalleVenta] = useState([])
+const [ventaxdia, setVentaXDia] = useState([])
 const [ver, setVer] = useState([]);
 const [buscardetalle, setBuscarDetalle] = useState('')
 
@@ -31,6 +32,14 @@ const verDetalleCompraCompleto = () => {
         setTotal(response.data.length)
     }).catch((err) => {
         console.error('Error al traer los detalles', err)
+    })
+}
+
+const verTotalVentaXDia = () => {
+    axios.get(`${URL}detalleventa/verTotalVentasXDia`).then((response)=> {
+        setVentaXDia(response.data[0].total_ventas_dia)
+    }).catch((err)=> {
+        console.error('Error al obtener ventas x dia', err)
     })
 }
 
@@ -65,6 +74,7 @@ const verDetalleCompraCompleto = () => {
 
 useEffect(()=>{
     verDetalleCompraCompleto()
+    verTotalVentaXDia()
 },[])
 
 
@@ -78,6 +88,7 @@ useEffect(()=>{
         VISUALIZA LOS DETALLES DE VENTA COMPLETOS.
     </h2>
 
+    <p style={{marginLeft: '10px'}}>SUMA TOTAL DE VENTAS EN LA FECHA:  <strong>{formatCurrency(ventaxdia)}</strong></p>
 <br />
  <MDBInputGroup className='mb-3'>
                 <span className='input-group-text'>
@@ -127,16 +138,6 @@ useEffect(()=>{
           </ul>
         </td>
 
-        {/* Lista de precios */}
-        {/* <td>
-          <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
-            {venta.productos.map((prod) => (
-              <li key={prod.Id_detalleventa}>
-                {formatCurrency(prod.Precio_costo)}
-              </li>
-            ))}
-          </ul>
-        </td> */}
         <td data-label="Total" style={{ fontWeight: "700", color: "#182848" }}>
           {formatCurrency(venta.precio_total)}
         </td>
