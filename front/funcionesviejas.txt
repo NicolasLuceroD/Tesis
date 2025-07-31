@@ -58,3 +58,69 @@
 //     console.error('Error al realizar la compra', err);
 //   })
 // }
+
+
+const FinalizarVenta = () => {
+  if (!metodopagoseleccionado || !clienteSeleccionado) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Faltan datos',
+      text: 'Por favor seleccione un cliente y un método de pago.',
+      confirmButtonColor: '#3085d6',
+      timer: 3500,
+      timerProgressBar: true
+    });
+    return;
+  }
+
+  if (carrito.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Carrito vacío',
+      text: 'Debe agregar al menos un producto a la venta.',
+      confirmButtonColor: '#3085d6',
+      timer: 3500,
+      timerProgressBar: true
+    });
+    return;
+  }
+
+  const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+
+  // Armar el array de productos con lo que espera el backend
+  const productosParaBackend = carrito.map(item => ({
+    Id_producto: item.Id_producto,
+    Id_lote: item.lote.Id_lote,
+    cantidad: item.cantidad,
+    precio_unitario: item.precio
+  }));
+
+  axios.post(`${URL}venta/registrarVenta`, {
+    precioTotal_Venta: totalVenta,
+    Id_cliente: clienteSeleccionado,
+    Id_usuario: idUsuario,
+    Id_metodoPago: metodopagoseleccionado,
+    productos: productosParaBackend
+  })
+  .then((response) => {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Venta registrada!',
+      html: `Venta registrada exitosamente.`,
+      confirmButtonColor: '#3085d6',
+      timer: 4000,
+      timerProgressBar: true,
+      width: '500px'
+    }).then(() => {
+      limpiarCampos();
+    });
+  })
+  .catch((error) => {
+    console.error('Error al registrar la venta', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Ocurrió un error al registrar la venta.',
+    });
+  });
+};

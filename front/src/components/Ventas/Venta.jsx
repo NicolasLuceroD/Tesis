@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePrescription, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import Paginacion from '../Common/Paginacion';
+import { imprimirTicket } from '../Utils/ImprimirTicket';
 
 const Venta = () => {
 
@@ -104,45 +105,62 @@ const FinalizarVenta = () => {
     return;
   }
 
-  const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  Swal.fire({
+    title: '¿Querés imprimir el ticket?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, imprimir',
+    cancelButtonText: 'No',
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#aaa'
+  }).then((result) => {
+    const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 
-  // Armar el array de productos con lo que espera el backend
-  const productosParaBackend = carrito.map(item => ({
-    Id_producto: item.Id_producto,
-    Id_lote: item.lote.Id_lote,
-    cantidad: item.cantidad,
-    precio_unitario: item.precio
-  }));
+    const productosParaBackend = carrito.map(item => ({
+      Id_producto: item.Id_producto,
+      Id_lote: item.lote.Id_lote,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio
+    }));
 
-  axios.post(`${URL}venta/registrarVenta`, {
-    precioTotal_Venta: totalVenta,
-    Id_cliente: clienteSeleccionado,
-    Id_usuario: idUsuario,
-    Id_metodoPago: metodopagoseleccionado,
-    productos: productosParaBackend
-  })
-  .then((response) => {
-    Swal.fire({
-      icon: 'success',
-      title: '¡Venta registrada!',
-      html: `Venta registrada exitosamente.`,
-      confirmButtonColor: '#3085d6',
-      timer: 4000,
-      timerProgressBar: true,
-      width: '500px'
-    }).then(() => {
+    axios.post(`${URL}venta/registrarVenta`, {
+      precioTotal_Venta: totalVenta,
+      Id_cliente: clienteSeleccionado,
+      Id_usuario: idUsuario,
+      Id_metodoPago: metodopagoseleccionado,
+      productos: productosParaBackend
+    })
+    .then((response) => {
+      if (result.isConfirmed) {
+        imprimirTicket({ carrito, clientes, clienteSeleccionado, metodospago, metodopagoseleccionado, formatCurrency });
+        Swal.fire({
+          icon: 'success',
+          title: '¡Venta registrada e imprimida!',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Venta registrada!',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      }
       limpiarCampos();
-    });
-  })
-  .catch((error) => {
-    console.error('Error al registrar la venta', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Ocurrió un error al registrar la venta.',
+    })
+    .catch((error) => {
+      console.error('Error al registrar la venta', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al registrar la venta.',
+      });
     });
   });
 };
+
+
 
 
 
