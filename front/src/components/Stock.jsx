@@ -98,19 +98,34 @@ useEffect(()=>{
               <td>{val.nombre_producto}</td>
               <td>{val.total_disponible}</td>
 
-            <td>
-              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-                {val.detalle_fechas.map((detalle, i) => (
-                  <li key={i}>{new Date(detalle.fecha_vencimiento).toLocaleDateString()}</li>
-                ))}
-              </ul>
-            </td>
+           <td>
+            <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+              {val.detalle_fechas.map((detalle, i) => {
+                const fechaVencimiento = new Date(detalle.fecha_vencimiento);
+                const hoy = new Date();
+                const estaVencido = fechaVencimiento < hoy; 
+                return (
+                  <li key={i} style={{ color: estaVencido ? 'red' : 'black', fontWeight: estaVencido ? 'bold' : 'normal' }}>
+                    {fechaVencimiento.toLocaleDateString()}
+                  </li>
+                );
+              })}
+            </ul>
+          </td>
 
             <td>
               <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-                {val.detalle_fechas.map((detalle, i) => (
-                  <li key={i}>{detalle.cantidad}</li>
-                ))}
+                {val.detalle_fechas.map((detalle, i) => {
+                  const fechaVencimiento = new Date(detalle.fecha_vencimiento);
+                  const hoy = new Date();
+                  const estaVencido = fechaVencimiento < hoy;
+
+                  return (
+                    <li key={i} style={{ color: estaVencido ? 'red' : 'black', fontWeight: estaVencido ? 'bold' : 'normal' }}>
+                      {detalle.cantidad}
+                    </li>
+                  );
+                })}
               </ul>
             </td>
 

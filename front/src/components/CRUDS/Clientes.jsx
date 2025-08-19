@@ -11,7 +11,7 @@ import { Button, ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Paginacion from '../Common/Paginacion';
 import Swal from 'sweetalert2';
-import { icon } from '@fortawesome/fontawesome-svg-core';
+import { scrollToTop } from '../Utils/scroll';
 
 const Clientes = () => {
 
@@ -165,6 +165,7 @@ const handleCliente = (val) => {
     setDocumentoCliente(val.documento_cliente)
     setMontoCredito(val.monto_credito)
     setLimiteCredito(val.limite_credito)
+    scrollToTop()
 }
 
 //LIMPIO CAMPOS

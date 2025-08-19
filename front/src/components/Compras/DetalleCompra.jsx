@@ -16,6 +16,7 @@ const { URL } = useContext(DataContext)
 
 //ESTADOS
 const [detallecompra, setDetalleCompra] = useState([])
+const [totalcompra, setTotalCompra] = useState([])
 const [ver, setVer] = useState([]);
 const [buscardetalle, setBuscarDetalle] = useState('')
 
@@ -32,6 +33,15 @@ const verDetalleCompraCompleto = () => {
     }).catch((err) => {
         console.error('Error al traer los detalles', err)
     })
+}
+
+//TRAER LOS MONTOS TOTALES DE COMPRA
+const verTotalCompra  = () => {
+  axios.get(`${URL}detallecompra/verTotalCompras`).then((response) => {
+    setTotalCompra(response.data[0].total_compras)
+  }).catch((error) => {
+    console.error('Error al obtener total compras', error)
+  })
 }
 
   //FUNCION PARA PASAR A PESOS ARG
@@ -65,6 +75,7 @@ const verDetalleCompraCompleto = () => {
 
 useEffect(()=>{
     verDetalleCompraCompleto()
+    verTotalCompra()
 },[])
 
 
@@ -93,6 +104,7 @@ useEffect(()=>{
   </MDBInputGroup>
  
 <br />
+<p style={{color: 'red', fontWeight: 'bold', marginLeft: '10px'}}>MONTO TOTAL DE COMPRAS: {formatCurrency(totalcompra)}</p>
   <table className="custom-table">
   <thead className="custom-table-header">
     <tr>
@@ -137,8 +149,9 @@ useEffect(()=>{
             ))}
           </ul>
         </td>
-
-        <td data-label="Total" style={{ fontWeight: "700", color: "#182848" }}>
+        
+        {/* Total de la venta*/}
+        <td data-label="Total" style={{ fontWeight: "700", color: "#182848", backgroundColor: '#8aeb9aff' }}>
           {formatCurrency(compra.precio_total)}
         </td>
 

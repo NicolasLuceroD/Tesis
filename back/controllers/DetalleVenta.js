@@ -54,14 +54,15 @@ const verDetalleVentaCompletoAgrupado = (req, res) => {
 };
 
 
-const verTotalVentasXDia = (req,res) => {
-  connection.query(`SELECT 
-                    SUM(precioTotal_Venta) AS total_ventas_dia
-                    FROM venta
-                    WHERE DATE(fecha_registro) = '2025-07-30'`,(error,results) => {
-                      if (error) throw error
-                      res.json(results)
-                    })
-}
+// const verTotalVentasXDia = (req,res) => {
+//   const fecha = req.query.fecha
+//   connection.query(`SELECT 
+//                     SUM(precioTotal_Venta) AS total_ventas_dia
+//                     FROM venta
+//                     WHERE DATE(fecha_registro) = ?`,[fecha],(error,results) => {
+//                       if (error) throw error
+//                       res.json(results)
+//                     })
+// }
 
-module.exports = {verDetalleVentaCompletoAgrupado,verTotalVentasXDia}
+module.exports = {verDetalleVentaCompletoAgrupado}

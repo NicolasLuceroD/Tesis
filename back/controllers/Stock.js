@@ -14,6 +14,7 @@ const verStock = (req, res) => {
       JOIN (
         SELECT Id_producto, SUM(cantidad_disponible) AS total_disponible
         FROM lotes
+        WHERE fecha_vencimiento >= CURDATE()  
         GROUP BY Id_producto
       ) total_por_producto ON total_por_producto.Id_producto = p.Id_producto
       WHERE l.cantidad_disponible > 0
@@ -21,13 +22,14 @@ const verStock = (req, res) => {
     (error, results) => {
       if (error) throw error;
 
-      const agrupado = {}; //creo un array vacio para AGRUPAR los productos
+      //creo un objeto vacio donde agrupar los productos por nombre
+      const agrupado = {};
 
-      //recorro cada fila que me llega de la consulta
+      //es el resultado de la consulta por cada fila traigo:
       results.forEach(row => {
-        const { Id_producto, nombre_producto, fecha_vencimiento, cantidad_disponible, nro_lote} = row;
+        const { Id_producto, nombre_producto, fecha_vencimiento, cantidad_disponible, nro_lote } = row;
 
-        //valido si es la primera vez del producto lo agrego al array 
+        //valido si el producto ya existe en agrupado
         if (!agrupado[nombre_producto]) {
           agrupado[nombre_producto] = {
             Id_producto,
@@ -36,10 +38,12 @@ const verStock = (req, res) => {
           };
         }
 
-        //sumo la cantidad al total general del producto
-        agrupado[nombre_producto].total += cantidad_disponible;
+        // Sumamos solo si no está vencido
+        if (new Date(fecha_vencimiento) >= new Date()) {
+          agrupado[nombre_producto].total += cantidad_disponible;
+        }
 
-        //agrego la fecha y cantidad al array detalle fechas
+        // Agregamos todos los lotes (válidos y vencidos) para control
         agrupado[nombre_producto].detalle_fechas.push({
           nro_lote,
           fecha_vencimiento,
@@ -51,6 +55,7 @@ const verStock = (req, res) => {
     }
   );
 };
+
 
 
 module.exports = {verStock}

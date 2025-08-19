@@ -9,6 +9,7 @@ import { faEnvelope, faIdCard, faPenToSquare, faTrashAlt, faUser } from '@fortaw
 import { faLocationDot, faPhone, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import Paginacion from "../Common/Paginacion";
+import { scrollToTop } from '../Utils/scroll'
 
 const Droguerias = () => {
 
@@ -99,6 +100,7 @@ const handleDrogueria = (val) => {
   setDireccionDrogueria(val.direccion_drogueria)
   setCorreoDrogueria(val.correo_drogueria)
   setBotonEditar(true)
+  scrollToTop()
 }
 
 

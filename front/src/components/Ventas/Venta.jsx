@@ -6,7 +6,7 @@ import { DataContext } from '../../context/DataContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePrescription, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faDollar, faFilePrescription, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import Paginacion from '../Common/Paginacion';
 import { imprimirTicket } from '../Utils/ImprimirTicket';
 
@@ -24,6 +24,7 @@ const [metodopagoseleccionado, setMetodopagoseleccionado] = useState('')
 const [buscarproducto, setBuscarProducto] = useState('')
 const [carrito, setCarrito] = useState([])
 const [montorecibido, setMontoRecibido] = useState('');
+const [interes, setInteres] = useState('')
 const [ver, setVer] = useState([]);
 
 //OBTENER EL ID USUARIO QUE VIENE DEL LOCAL STORAGE
@@ -166,14 +167,33 @@ const FinalizarVenta = () => {
 
 //AGREGAR A LA VENTA
 const agregarAlCarrito = (producto) => {
-  const loteCercano = producto.lotes.reduce((prev, curr) =>
+
+  // filtramos solo los lotes que no estén vencidos
+  const lotesValidos = producto.lotes.filter(l => {
+    const diasRestantes = Math.ceil((new Date(l.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24)); //esto calcula cuantos dias faltan para el vencimiento
+    return diasRestantes >= 0; // solo lotes no vencidos
+  });
+
+  //validamos si hay lotes validos
+  if (lotesValidos.length === 0) {
+    alert("No hay lotes disponibles válidos para este producto.");
+    return;
+  }
+
+  // tomamos el lote más cercano a vencer entre los válidos
+  const loteCercano = lotesValidos.reduce((prev, curr) =>
     new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
   );
 
-  const stockDisponible = loteCercano.cantidad_disponible; 
+  // tomamos la cantidad disp de ese lote
+  const stockDisponible = loteCercano.cantidad_disponible;
 
-  const existe = carrito.find((item) => item.Id_producto === producto.Id_producto && item.lote.Id_lote === loteCercano.Id_lote);
+  // verificamos si el prod ya esta en el carrito
+  const existe = carrito.find((item) =>
+    item.Id_producto === producto.Id_producto && item.lote.Id_lote === loteCercano.Id_lote
+  );
 
+  // si ya esta en el carrito aumentar cantidad
   if (existe) {
     if (existe.cantidad < stockDisponible) {
       const nuevoCarrito = carrito.map((item) => {
@@ -212,6 +232,7 @@ const agregarAlCarrito = (producto) => {
     }
   }
 };
+
 
 const cambiarTipoPrecio = (index, nuevoTipo) => {
   const nuevoCarrito = [...carrito];
@@ -269,7 +290,10 @@ const formatCurrency = (value) => {
   }
 
   const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  const interesNumero = parseFloat(interes) || 0
+  const totalConInteres = totalVenta + (totalVenta * interesNumero / 100);
   const vuelto = montorecibido ? montorecibido - totalVenta : 0;
+  const subtotal = totalVenta
 
 //PAGINACION
   const productosPorPagina = 5
@@ -313,7 +337,9 @@ useEffect(()=>{
           {/* Búsqueda de productos */}
           <Col md={5}>
             <Card className="mb-3">
-              <Card.Header>Búsqueda de productos</Card.Header>
+              <Card.Header>
+                <FontAwesomeIcon icon={faSearch} /> Búsqueda de productos
+                </Card.Header>
               <Card.Body>
                 <MDBInputGroup className="mb-3">
                   <span className="input-group-text">
@@ -337,13 +363,18 @@ useEffect(()=>{
                     </tr>
                   </thead>
                   <tbody>
-                    {productosFiltrados.slice(primerIndex, ultimoIndex).map((prod) => {
-                      const loteCercano = prod.lotes.reduce((prev, curr) =>
+                      {productosFiltrados.slice(primerIndex, ultimoIndex).map((prod) => {
+                      /* Aca filtro los lotes que no esten vencidos*/
+                      const lotesValidos = prod.lotes.filter(l => {
+                        const diasRestantes = Math.ceil((new Date(l.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
+                        return diasRestantes >= 0; // solo lotes no vencidos
+                      });
+
+                       // Tomamos el lote más cercano a vencer
+                      const loteCercano = lotesValidos.reduce((prev, curr) =>
                         new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
                       );
-                      const hoy = new Date();
-                      const vto = new Date(loteCercano.fecha_vencimiento);
-                      const diasRestantes = Math.ceil((vto - hoy) / (1000 * 60 * 60 * 24));
+                      const diasRestantes = Math.ceil((new Date(loteCercano.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
                       const estaPorVencer = diasRestantes <= 5;
 
                       return (
@@ -351,7 +382,7 @@ useEffect(()=>{
                           <td>
                             <strong>{prod.nombre_producto}</strong><br />
                             <small>Código: {prod.codigobarras_producto}</small><br />
-                            <small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small><br />
+                            <strong><small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small></strong><br />
                             <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
                             <small>Lote: {loteCercano.nro_lote}</small><br />
 
@@ -450,7 +481,9 @@ useEffect(()=>{
       {/* Resumen y pago */}
       <Col md={4}>
         <Card>
-          <Card.Header>Resumen y Pago</Card.Header>
+          <Card.Header>
+           <FontAwesomeIcon icon={faDollar} /> Resumen y Pago
+            </Card.Header>
           <Card.Body>
             <Form.Group className="mb-3">
               <Form.Label>Cliente</Form.Label>
@@ -474,6 +507,14 @@ useEffect(()=>{
                 ))}
               </Form.Select>
             </Form.Group>
+          
+          {(parseInt(metodopagoseleccionado) === 2 || parseInt(metodopagoseleccionado) === 3) && (
+            <Form.Group className='mb-3'>
+              <Form.Label>Interes (%)</Form.Label>
+              <Form.Control type='number' value={interes} onChange={(e) => setInteres(e.target.value)} placeholder='0'/>
+            </Form.Group>
+          )}
+            
 
             <Form.Group className="mb-3">
               <Form.Label>Monto recibido</Form.Label>
@@ -486,8 +527,9 @@ useEffect(()=>{
             </Form.Group>
 
             <hr />
-
-            <p className="total">TOTAL: <strong>{formatCurrency(totalVenta)}</strong></p>
+            
+            <p className='subtotal'> SUBTOTAL: <strong>{formatCurrency(subtotal)}</strong></p>
+            <p className="total">TOTAL: <strong>{formatCurrency(totalConInteres)}</strong></p>
             <p className="vuelto">VUELTO: <strong>{formatCurrency(vuelto >= 0 ? vuelto : 0)}</strong></p>
 
             <Button variant="success" size="lg" className="w-100 mt-3" onClick={FinalizarVenta}>

@@ -35,13 +35,13 @@ const verDetalleCompraCompleto = () => {
     })
 }
 
-const verTotalVentaXDia = () => {
-    axios.get(`${URL}detalleventa/verTotalVentasXDia`).then((response)=> {
-        setVentaXDia(response.data[0].total_ventas_dia)
-    }).catch((err)=> {
-        console.error('Error al obtener ventas x dia', err)
-    })
-}
+// const verTotalVentaXDia = (fecha) => {
+//     axios.get(`${URL}detalleventa/verTotalVentasXDia?fecha=${fecha}`).then((response)=> {
+//         setVentaXDia(response.data[0].total_ventas_dia)
+//     }).catch((err)=> {
+//         console.error('Error al obtener ventas x dia', err)
+//     })
+// }
 
   //FUNCION PARA PASAR A PESOS ARG
   const formatCurrency = (value) => {
@@ -51,6 +51,11 @@ const verTotalVentaXDia = () => {
     }).format(value);
   };
 
+//   const handleBuscar = () => {
+//   if (buscardetalle) {
+//     verTotalVentaXDia(buscardetalle); // <-- busca solo cuando se clickea
+//   }
+// }
 
  //FILTRO POR DETALLE
   const buscador = (e) => {
@@ -74,7 +79,6 @@ const verTotalVentaXDia = () => {
 
 useEffect(()=>{
     verDetalleCompraCompleto()
-    verTotalVentaXDia()
 },[])
 
 
@@ -100,7 +104,8 @@ useEffect(()=>{
                   placeholder="Busca una compra por fecha (Ej: 19/6/2025)"
                   value={buscardetalle}
                   onChange={buscador}
-                /><br />
+                />
+                  {/* <button onClick={handleBuscar} className="btn btn-primary">Buscar</button><br /> */}
   </MDBInputGroup>
  
 <br />
@@ -118,6 +123,7 @@ useEffect(()=>{
   <tbody>
     {detallesFiltrados.slice(primerIndex,ultimoIndex).map((venta) => (
       <tr key={venta.Id_venta}>
+        {/* Folio de la venta*/}
         <td>{venta.Id_venta}</td>
 
         {/* Lista de productos */}
@@ -137,8 +143,9 @@ useEffect(()=>{
             ))}
           </ul>
         </td>
-
-        <td data-label="Total" style={{ fontWeight: "700", color: "#182848" }}>
+        
+        {/* Total de la venta*/}
+        <td data-label="Total" style={{ fontWeight: "700", color: "#182848", backgroundColor: '#8aeb9aff', width: '150px' }}>
           {formatCurrency(venta.precio_total)}
         </td>
 

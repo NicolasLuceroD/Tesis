@@ -8,6 +8,7 @@ import axios from 'axios'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import Paginacion from "../Common/Paginacion";
 import Swal from 'sweetalert2'
+import { scrollToTop } from '../Utils/scroll'
 
 const Productos = () => {
 
@@ -181,6 +182,7 @@ const handleProducto = (val) => {
     setInventario_minimo(val.inventario_minimo)
     setId_producto(val.Id_producto)
     setId_categoria(val.Id_categoria)
+    scrollToTop()
 }
 
 

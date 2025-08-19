@@ -101,7 +101,7 @@ function App() {
           <FontAwesomeIcon icon={faUsers} className="me-2" /> CLIENTES
         </NavDropdown.Item>
         <NavDropdown.Item as={Link} to="/creditosp">
-          <FontAwesomeIcon icon={faHandshake} className="me-2" /> PROVEEDORES
+          <FontAwesomeIcon icon={faHandshake} className="me-2" /> DROGUERIAS
         </NavDropdown.Item>
       </NavDropdown>
 

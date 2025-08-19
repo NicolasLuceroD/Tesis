@@ -124,3 +124,17 @@ const FinalizarVenta = () => {
     });
   });
 };
+
+//FUNCION PARA VALIDAR QUE SOLO SE MUESTREN LOTES NO VENCIDOS
+  {productosFiltrados.slice(primerIndex, ultimoIndex).map((prod) => {
+                      const lotesValidos = prod.lotes.filter(l => {
+                        const diasRestantes = Math.ceil((new Date(l.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
+                        return diasRestantes >= 0; // solo lotes no vencidos
+                      });
+
+                       // Tomamos el lote más cercano a vencer
+                      const loteCercano = lotesValidos.reduce((prev, curr) =>
+                        new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
+                      );
+                      const diasRestantes = Math.ceil((new Date(loteCercano.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
+    const estaPorVencer = diasRestantes <= 5;

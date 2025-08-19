@@ -213,29 +213,42 @@
   border-radius: 5px;
 }
 
-.total {
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: #27ae60;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-  margin-bottom: 12px;
-  font-family: 'Courier New', Courier, monospace;
-}
-
-.vuelto {
+.subtotal {
   font-weight: 600;
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #ddd;
+  font-size: 1.2rem;
+  color: #2c3e50; 
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #ccc;
   padding-bottom: 4px;
   font-family: 'Courier New', Courier, monospace;
 }
 
+.total {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #27ae60; 
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  margin-bottom: 8px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.vuelto {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #c0392b; 
+  margin-bottom: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #fdecea;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
 .columna-detallev-usuario {
-  background-color: #4b6bb7da;
+  background-color: #8dadf8da;
   width: 200px;
 }
+
 
 .validaciones{
   margin: 10px 20px;

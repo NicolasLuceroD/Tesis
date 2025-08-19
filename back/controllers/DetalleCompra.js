@@ -64,6 +64,13 @@ const verDetalleCompraCompletoAgrupado = (req, res) => {
   });
 };
 
+const verTotalCompras = (req,res) => {
+  connection.query(`SELECT SUM(c.Total) AS total_compras FROM compra c`,(error,results) => {
+    if (error) throw error
+    res.json(results)
+  })
+}
+
 // const verDetalleCompraCompleto = (req,res) => {
 //     connection.query('SELECT dc.*, p.nombre_producto FROM detallecompra dc INNER JOIN productos p ON dc.Id_producto = p.Id_producto ORDER BY dc.Id_compra;', (error,results) => {
 //         if (error) throw error
@@ -71,4 +78,4 @@ const verDetalleCompraCompletoAgrupado = (req, res) => {
 //     })
 // }
 
-module.exports = {registrarDetalleCompra,verDetalleCompraCompletoAgrupado}
+module.exports = {registrarDetalleCompra,verDetalleCompraCompletoAgrupado,verTotalCompras}
