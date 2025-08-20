@@ -56,9 +56,41 @@ const verStock = (req, res) => {
   );
 };
 
+const verTotalProductoCategorias = (req,res) => {
+  connection.query(`SELECT 
+                          c.nombre_categoria,
+                          SUM(l.cantidad_disponible) AS total_disponible
+                      FROM lotes l
+                      JOIN productos p ON p.Id_producto = l.Id_producto
+                      JOIN categoria c ON c.Id_categoria = p.Id_categoria
+                      WHERE l.fecha_vencimiento >= CURDATE()
+                        AND l.cantidad_disponible > 0
+                      GROUP BY c.nombre_categoria
+                      ORDER BY total_disponible DESC, c.nombre_categoria ASC`, (error,results) => {
+                      if (error) throw error
+                      res.json(results)
+                    })
+}
+
+const verProductosVencidos = (req,res) => {
+  connection.query(`SELECT 
+                        p.Id_producto,
+                        p.nombre_producto,
+                        SUM(l.cantidad_disponible) AS total_vencido
+                    FROM lotes l
+                    JOIN productos p ON p.Id_producto = l.Id_producto
+                    WHERE l.fecha_vencimiento < CURDATE()  -- solo vencidos
+                      AND l.cantidad_disponible > 0
+                    GROUP BY p.Id_producto, p.nombre_producto
+                    ORDER BY total_vencido DESC, p.nombre_producto ASC`,(error,results) => {
+                      if (error) throw error
+                      res.json(results)
+                    })
+}
 
 
-module.exports = {verStock}
+
+module.exports = {verStock, verTotalProductoCategorias, verProductosVencidos}
 
 
 

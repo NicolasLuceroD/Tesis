@@ -6,7 +6,7 @@ import { DataContext } from '../../context/DataContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDollar, faFilePrescription, faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faDollar, faFilePrescription, faSearch, faShoppingCart, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Paginacion from '../Common/Paginacion';
 import { imprimirTicket } from '../Utils/ImprimirTicket';
 
@@ -445,6 +445,7 @@ useEffect(()=>{
                       <th>PRECIO</th>
                       <th>TIPO PRECIO</th>
                       <th>SUBTOTAL</th>
+                      <th>ELIMINAR</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -468,6 +469,11 @@ useEffect(()=>{
                           </Form.Select>
                         </td>
                         <td><b>{formatCurrency(item.precio * item.cantidad)}</b></td>
+                        <td>
+                          <button className="btn btn-danger">
+                            <FontAwesomeIcon icon={faTrash} color="white" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
