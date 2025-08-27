@@ -112,7 +112,7 @@ export const imprimirTicket = ({carrito, clientes, clienteSeleccionado, metodosp
                 <th class="qty">Cant</th>
                 <th class="product">Artículo</th>
                 <th class="price">Precio</th>
-                <th class="total">Total</th>
+                <th class="total">Subtotal</th>
               </tr>
             </thead>
             <tbody>

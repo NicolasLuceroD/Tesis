@@ -10,6 +10,7 @@ import {  Button, ButtonGroup, Modal } from 'react-bootstrap'
 import Form from 'react-bootstrap/Form'; 
 import Paginacion from '../Common/Paginacion'
 import Swal from 'sweetalert2'
+import { scrollToTop } from '../Utils/scroll'
 
 const Usuarios = () => {
 
@@ -190,6 +191,7 @@ const hanldeUsuario = (val) => {
     setNombreUsuario(val.nombre_usuario)
     setClaveUsuario(val.clave)
     setRolUsuario(val.rol_usuario)
+    scrollToTop()
 }
 
 //LIMPIAR CAMPOS
@@ -228,48 +230,68 @@ useEffect(()=>{
 <div className='h3-subtitulos'>
           <h3>USUARIOS</h3>
 </div>
-        <h2 className='text-center'>ADMINISTRACION DE USUARIOS</h2>
-        <h4 className='text-center'>Gestiona todos los usuarios de tu negocio</h4>
+        <div style={{textAlign: 'center', marginTop: '20px'}}>
+            <h3>ADMINISTRACION DE USUARIOS</h3>
+            <h4>Gestiona todos los usuarios de tu negocio</h4>
+        </div>
 
         <div className='container-fluid'>
         <div className='container'><br />
 
         {/* NOMBRE USUARIO */}
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faUser} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese usuario' value={nombre_usuario} onChange={(e) => setNombreUsuario(e.target.value)} />
-        </MDBInputGroup>
+         <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faUser} className="me-1" />
+                  NOMBRE USUARIO
+                </small>
+                <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faUser} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: Nicolas' value={nombre_usuario} onChange={(e) => setNombreUsuario(e.target.value)} />
+                </MDBInputGroup>
+         </div>
 
         {/* CLAVE USUARIO */}
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faKey} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type={mostrarClave ? 'text' : 'password'} placeholder='Ingrese clave' value={clave_usuario} onChange={(e) => setClaveUsuario(e.target.value)} />
-        <span className='input-group-text' style = {{cursor: 'pointer'}} onClick={() => setMostrarClave(!mostrarClave)}>
-         <FontAwesomeIcon icon={mostrarClave ? faEyeSlash : faEye} />
-        </span>
-        </MDBInputGroup>
+        <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faKey} className="me-1" />
+                  CLAVE
+                </small>
+                <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faKey} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type={mostrarClave ? 'text' : 'password'} placeholder='Ingrese clave' value={clave_usuario} onChange={(e) => setClaveUsuario(e.target.value)} />
+                <span className='input-group-text' style = {{cursor: 'pointer'}} onClick={() => setMostrarClave(!mostrarClave)}>
+                <FontAwesomeIcon icon={mostrarClave ? faEyeSlash : faEye} />
+                </span>
+                </MDBInputGroup>
+        </div>
 
         {/* SELECT PARA EL ROL */}
-        <MDBInputGroup className='mb-3'>
-            <span className="input-group-text">
-                <FontAwesomeIcon icon={faUserShield} size="lg" style={{color: "#ff5e5e"}}/>
-            </span>
-            <Form.Select
-                aria-label="Tipo de venta"
-                value={rol_usuario}
-                onChange={(e) => setRolUsuario(e.target.value)}
-                id="usuariosRol"
-            >
-                <option value="0">Selecciona un rol</option>
-                <option value="admin">admin</option>
-                <option value="empleado">empleado</option>
-                <option value="encargado">encargado</option>
-            </Form.Select>
-        </MDBInputGroup>
+        <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faUserShield} className="me-1" />
+                  ROL
+                </small>
+                <MDBInputGroup className='mb-3'>
+                    <span className="input-group-text">
+                        <FontAwesomeIcon icon={faUserShield} size="lg" style={{color: "#ff5e5e"}}/>
+                    </span>
+                    <Form.Select
+                        aria-label="Tipo de venta"
+                        value={rol_usuario}
+                        onChange={(e) => setRolUsuario(e.target.value)}
+                        id="usuariosRol"
+                    >
+                        <option value="0">Selecciona un rol</option>
+                        <option value="admin">admin</option>
+                        <option value="empleado">empleado</option>
+                        <option value="encargado">encargado</option>
+                    </Form.Select>
+                </MDBInputGroup>
+        </div>
      
     <br />
         {/* BOTONES */}
@@ -284,12 +306,18 @@ useEffect(()=>{
             )}
         </div>
         <br />
+         <div className="mb-3">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faSearch} className="me-1" />
+                  BUSCA UN USUARIO
+                </small>
          <MDBInputGroup className='mb-3'>
                         <span className='input-group-text'>
                             <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#ff5e5e"}}/>
                         </span>
         <input type="text" placeholder='Busca un usuario...' className='form-control' value={buscarusuario} onChange={buscador}/> 
-          </MDBInputGroup> 
+          </MDBInputGroup>
+          </div> 
 </div>
 </div>    
 

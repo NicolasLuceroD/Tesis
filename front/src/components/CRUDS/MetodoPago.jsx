@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faTrashAlt, faUser } from '@fortawesome/free-regular-svg-icons'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { faWallet } from '@fortawesome/free-solid-svg-icons'
+import { scrollToTop } from '../Utils/scroll'
 
 const MetodoPago = () => {
 
@@ -78,6 +79,7 @@ const handleMetodoPago = (val) => {
 setBotonEditar(true)
 setIdMetodoPago(val.Id_metodoPago)
 setNombreMetodoPago(val.nombre_metodopago)
+scrollToTop()
 }
 
 //LIMPIAR CAMPOS
@@ -98,8 +100,11 @@ useEffect(()=>{
 <div className='h3-subtitulos'>
           <h3>METODOS DE PAGO</h3>
 </div>
-    <h2 className='text-center'>METODO DE PAGO</h2>
-    <h4 className='text-center'>Administra metodos de pago de tu negocio</h4>
+
+    <div style={{textAlign: 'center', marginTop: '20px'}}>
+      <h3>ADMINISTRACION DE METODOS DE PAGO</h3>
+      <h5>Administra metodos de pago de tu negocio</h5>
+    </div>
     <br />
 
 

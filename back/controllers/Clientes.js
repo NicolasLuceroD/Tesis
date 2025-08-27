@@ -52,6 +52,16 @@ const eliminarCliente = (req,res) => {
         })
 }
 
+const aumentarCredito = (req,res) => {
+    console.log('Body recibido:', req.body);
+    const Id_cliente = req.body.Id_cliente
+    const monto_credito = req.body.monto_credito
+
+    connection.query("UPDATE clientes SET monto_credito = monto_credito + ? WHERE Id_cliente = ?", [monto_credito, Id_cliente], (error,results) => {
+        if (error) throw error
+        res.json(results)
+    })
+}
 
 
-module.exports={verClientes,crearClientes,editarClientes,eliminarCliente}
+module.exports={verClientes,crearClientes,editarClientes,eliminarCliente,aumentarCredito}

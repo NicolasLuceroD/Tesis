@@ -9,6 +9,7 @@ import axios from 'axios'
 import Paginacion from '../Common/Paginacion';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
+import { scrollToTop } from '../Utils/scroll';
 
 
 const Categoria = () => {
@@ -133,6 +134,7 @@ const handleCategoria = (val) => {
     setBotonEditar(true)
     setIdCategoria(val.Id_categoria)
     setNombreCategoria(val.nombre_categoria)
+    scrollToTop()
 }
 
 
@@ -177,16 +179,26 @@ useEffect(()=>{
           <h3>CATEGORIAS</h3>
 </div>
 
+
+
 <div className='container-fluid'>
     <div className='container'><br />
-        <h2 className='text-center'>ADMINISTRACION DE CATEGORIAS</h2>
-        <h4 className='text-center'>Gestiona todos los departamentos de tu negocio</h4>
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faClipboard} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese nombre de categoria' value={nombre_categoria} onChange={(e) => setNombreCategoria(e.target.value)} />
-        </MDBInputGroup><br />
+        <h3 className='text-center'>ADMINISTRACION DE CATEGORIAS</h3>
+        <h5 className='text-center'>Gestiona todos los departamentos de tu negocio</h5><br />
+
+         <div className="mb-3">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faClipboard} className="me-1" />
+                  NOMBRE CATEGORIA
+                </small>
+                <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faClipboard} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: Analgesicos' value={nombre_categoria} onChange={(e) => setNombreCategoria(e.target.value)} />
+                </MDBInputGroup>
+        </div>
+        <br />
         <div className='col-12 d-flex justify-content-center'>
             {botoneditar ? (
                 <>
@@ -198,12 +210,18 @@ useEffect(()=>{
             )}
         </div>
         <br /><br />
+        <div className="mb-3">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faSearch} className="me-1" />
+                  BUSCA UNA CATEGORIA
+                </small>
            <MDBInputGroup className='mb-3'>
                                     <span className='input-group-text'>
                                         <FontAwesomeIcon icon={faSearch} size="lg" style={{color: "#ff5e5e"}}/>
                                     </span>
             <input type="text" placeholder='Busca una categoria...' value={buscarcategoria} onChange={buscador} className='form-control' />
-             </MDBInputGroup> 
+             </MDBInputGroup>
+             </div> 
 </div>
           
 <br /><br /><br />

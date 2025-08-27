@@ -5,7 +5,7 @@ import { faBarcode, faClipboard, faDollar, faPenToSquare, faSearch, faTrashCan }
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios'
-import { Button, ButtonGroup } from 'react-bootstrap'
+import { Button, ButtonGroup, Card } from 'react-bootstrap'
 import Paginacion from "../Common/Paginacion";
 import Swal from 'sweetalert2'
 import { scrollToTop } from '../Utils/scroll'
@@ -193,7 +193,8 @@ const handleProducto = (val) => {
 
 // Filtrar productos
   const productosFiltrados = verProductos.filter((dato) =>
-    dato.nombre_producto.toLowerCase().includes(buscarproducto.toLowerCase())
+    dato.nombre_producto.toLowerCase().includes(buscarproducto.toLowerCase()) ||
+    dato.codigobarras_producto.toLowerCase().includes(buscarproducto.toLocaleLowerCase())
   );
 
 //PAGINACION NUEVA
@@ -223,110 +224,157 @@ useEffect(()=>{
     <div className='h3-subtitulos'>
           <h3>PRODUCTOS</h3>
     </div>
+
+    <div style={{textAlign: 'center', marginTop: '20px'}}>
+        <h3>ADMINISTRACION DE PRODUCTOS</h3>
+        <h5>Gestiona todos los productos de tu negocio</h5> 
+    </div>
+
      <div className='container-fluid'>
         <div className='container'><br />
 
-        {/* CODIGO BARRAS */}
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faBarcode} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Codigo de barras' value={codigobarras_producto} onChange={(e) => setCodigobarras_producto(e.target.value)} />
-        </MDBInputGroup>
+       <div className="mb-3">
+          <small className="text-muted d-block mb-1">
+            <FontAwesomeIcon icon={faBarcode} className="me-1" />
+            CODIGO DE BARRAS
+          </small>
+          <MDBInputGroup>
+            <span className="input-group-text">
+              <FontAwesomeIcon icon={faBarcode} size="lg" style={{ color: "#ff5e5e" }} />
+            </span>
+            <input className="form-control" type="text" placeholder="Ej: 750100000001" value={codigobarras_producto} onChange={(e) => setCodigobarras_producto(e.target.value)}/>
+          </MDBInputGroup>
+      </div>
 
         {/* NOMBRE PRODUCTO */}
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faClipboard} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type='text'  placeholder='Nombre producto' value={nombre_producto} onChange={(e) => setNombre_producto(e.target.value)} />
-        <span className='input-group-text'>
-         <FontAwesomeIcon icon={faClipboard}/>
-        </span>
-        </MDBInputGroup>
+        <div className='mb-3'>
+            <small className='text-muted d-block mb-1'>
+              <FontAwesomeIcon icon={faClipboard} className='me-1'/>
+              NOMBRE PRODUCTO
+            </small>
+          <MDBInputGroup className='mb-3'>
+          <span className='input-group-text'>
+              <FontAwesomeIcon icon={faClipboard} size="lg" style={{color: "#ff5e5e"}}/>
+          </span>
+          <input className='form-control' type='text'  placeholder='Ej: Paracetamol Grip' value={nombre_producto} onChange={(e) => setNombre_producto(e.target.value)} />
+          <span className='input-group-text'>
+            <FontAwesomeIcon icon={faClipboard}/>
+          </span>
+          </MDBInputGroup>
+        </div>
 
         
         {/* PRECIO COSTO */}
-         <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type='number'  placeholder='Precio costo' value={precio_costo} onChange={(e) => setPrecio_costo(e.target.value)} />
-        <span className='input-group-text'>
-         <FontAwesomeIcon icon={faDollar}/>
-        </span>
-        </MDBInputGroup>
+        <div className='mb-3'>
+              <small className='text-muted d-block mb-1'>
+                <FontAwesomeIcon icon={faDollar} className='me-1'/>
+                PRECIO COSTO
+              </small>
+              <MDBInputGroup className='mb-3'>
+              <span className='input-group-text'>
+                  <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
+              </span>
+              <input className='form-control' type='number'  placeholder='Ej: 150.00' value={precio_costo} onChange={(e) => setPrecio_costo(e.target.value)} />
+              <span className='input-group-text'>
+                <FontAwesomeIcon icon={faDollar}/>
+              </span>
+              </MDBInputGroup>
+        </div>
 
         {/* PRECIO UNITARIO */}
-         <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type='number'  placeholder='Precio unitario' value={precio_unitario} onChange={(e) => setPrecio_unitario(e.target.value)} />
-        <span className='input-group-text'>
-         <FontAwesomeIcon icon={faDollar}/>
-        </span>
-        </MDBInputGroup>
+        <div className='mb-3'>
+              <small className='text-muted d-block mb-1'>
+                <FontAwesomeIcon icon={faDollar} className='me-1'/>
+                PRECIO UNITARIO
+              </small>
+              <MDBInputGroup className='mb-3'>
+                  <span className='input-group-text'>
+                      <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
+                  </span>
+                  <input className='form-control' type='number'  placeholder='Ej: 250.00' value={precio_unitario} onChange={(e) => setPrecio_unitario(e.target.value)} />
+                  <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faDollar}/>
+                  </span>
+              </MDBInputGroup>
+        </div>
 
         {/* PRECIO TIRA*/}
-         <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type='number'  placeholder='Precio tira' value={precio_tira} onChange={(e) => setPrecio_tira(e.target.value)} />
-        <span className='input-group-text'>
-         <FontAwesomeIcon icon={faDollar}/>
-        </span>
-        </MDBInputGroup>
+         <div className='mb-3'>
+              <small className='text-muted d-block mb-1'>
+                <FontAwesomeIcon icon={faDollar} className='me-1'/>
+                PRECIO TIRA
+              </small>
+              <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type='number'  placeholder='Dejar en 0 si no aplica' value={precio_tira} onChange={(e) => setPrecio_tira(e.target.value)} />
+                <span className='input-group-text'>
+                  <FontAwesomeIcon icon={faDollar}/>
+                </span>
+              </MDBInputGroup>
+         </div>
 
 
         {/* PRECIO CAJA*/}
-         <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type='number'  placeholder='Precio caja' value={precio_caja} onChange={(e) => setPrecio_caja(e.target.value)} />
-        <span className='input-group-text'>
-         <FontAwesomeIcon icon={faDollar}/>
-        </span>
-        </MDBInputGroup>
+         <div className='mb-3'>
+              <small className='text-muted d-block mb-1'>
+                <FontAwesomeIcon icon={faDollar} className='me-1'/>
+                PRECIO CAJA
+              </small>
+              <MDBInputGroup className='mb-3'>
+              <span className='input-group-text'>
+                  <FontAwesomeIcon icon={faDollar} size="lg" style={{color: "#ff5e5e"}}/>
+              </span>
+              <input className='form-control' type='number'  placeholder='Dejar en 0 si no aplica' value={precio_caja} onChange={(e) => setPrecio_caja(e.target.value)} />
+              <span className='input-group-text'>
+              <FontAwesomeIcon icon={faDollar}/>
+                </span>
+              </MDBInputGroup>
+        </div>
         
         
         {/* INVENTRARIO MINIMO*/}
-         <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faClipboard} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type='number'  placeholder='Inventario minimo' value={inventario_minimo} onChange={(e) => setInventario_minimo(e.target.value)} />
-        <span className='input-group-text'>
-         <FontAwesomeIcon icon={faClipboard}/>
-        </span>
-        </MDBInputGroup>
+         <div className='mb-3'>
+              <small className='text-muted d-block mb-1'>
+                <FontAwesomeIcon icon={faClipboard} className='me-1'/>
+                INVENTARIO MINIMO
+              </small>
+              <MDBInputGroup className='mb-3'>
+              <span className='input-group-text'>
+                  <FontAwesomeIcon icon={faClipboard} size="lg" style={{color: "#ff5e5e"}}/>
+              </span>
+              <input className='form-control' type='number'  placeholder='Ej: 10' value={inventario_minimo} onChange={(e) => setInventario_minimo(e.target.value)} />
+              <span className='input-group-text'>
+              <FontAwesomeIcon icon={faClipboard}/>
+                </span>
+              </MDBInputGroup>
+         </div>
 
 
   {/*CATEGORIAS SELECT*/}
+   <div className='mb-3'>
+              <small className='text-muted d-block mb-1'>
+                <FontAwesomeIcon icon={faClipboard} className='me-1'/>
+                CATEGORIA
+              </small>
                <MDBInputGroup className='mb-3'>
-                <span className='input-group-text'>
-                    <FontAwesomeIcon icon={faClipboard} size="lg" style={{ color: "#ff5e5e" }} />
-                </span>
-
-                <select
-                    className='form-control'
-                    value={Id_categoria}
-                    onChange={(e) => setId_categoria(e.target.value)}
-                >
-                    <option value="">Selecciona una categoría</option>
-                    {verCategorias.map((cat) => (
-                    <option key={cat.Id_categoria} value={cat.Id_categoria}>
-                        {cat.nombre_categoria}
-                    </option>
-                    ))}
-                </select>
-
-                <span className='input-group-text'>
-                    <FontAwesomeIcon icon={faClipboard} />
-                </span>
+                  <span className='input-group-text'>
+                      <FontAwesomeIcon icon={faClipboard} size="lg" style={{ color: "#ff5e5e" }} />
+                  </span>
+                  <select className='form-control' value={Id_categoria} onChange={(e) => setId_categoria(e.target.value)}>
+                      <option value="">Selecciona una categoría</option>
+                      {verCategorias.map((cat) => (
+                      <option key={cat.Id_categoria} value={cat.Id_categoria}>
+                          {cat.nombre_categoria}
+                      </option>
+                      ))}
+                  </select>
+                  <span className='input-group-text'>
+                      <FontAwesomeIcon icon={faClipboard} />
+                  </span>
                 </MDBInputGroup>
+    </div>
     </div>
     </div>
 <br />

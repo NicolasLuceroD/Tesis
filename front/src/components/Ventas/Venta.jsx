@@ -25,6 +25,9 @@ const [buscarproducto, setBuscarProducto] = useState('')
 const [carrito, setCarrito] = useState([])
 const [montorecibido, setMontoRecibido] = useState('');
 const [interes, setInteres] = useState('')
+const [creditoActual, setCreditoActual] = useState(0)
+const [idCliente, setId_Cliente] = useState(null)
+const [limiteCredito, setLimiteCredito] = useState(0)
 const [ver, setVer] = useState([]);
 
 //OBTENER EL ID USUARIO QUE VIENE DEL LOCAL STORAGE
@@ -81,6 +84,17 @@ const agruparProductosPorLote = (data) => {
   }, []);
 };
 
+const seleccionarCliente = (Id_Cliente) => {
+  setId_Cliente(Id_Cliente);
+  const cliente = clientes.find(c => c.Id_cliente === parseInt(Id_Cliente));
+  if (cliente) {
+    setCreditoActual(cliente.montoCredito);
+    setLimiteCredito(cliente.limite_credito);
+  } else {
+    console.log('Cliente no encontrado');
+  }
+};
+
 const FinalizarVenta = () => {
   if (!metodopagoseleccionado || !clienteSeleccionado) {
     Swal.fire({
@@ -114,29 +128,75 @@ const FinalizarVenta = () => {
     cancelButtonText: 'No',
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#aaa'
-  }).then((result) => {
-    const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  }).then(async (result) => {
+    try {
+      const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+      const interesNumero = parseFloat(interes) || 0;
+      const totalConInteres = totalVenta + (totalVenta * interesNumero / 100);
 
-    const productosParaBackend = carrito.map(item => ({
-      Id_producto: item.Id_producto,
-      Id_lote: item.lote.Id_lote,
-      cantidad: item.cantidad,
-      precio_unitario: item.precio
-    }));
+      const cliente = clientes.find(c => c.Id_cliente === parseInt(clienteSeleccionado));
+      const creditoActual = cliente ? parseFloat(cliente.monto_credito) : 0;
+      const nuevoCredito = creditoActual + totalConInteres;
 
-    axios.post(`${URL}venta/registrarVenta`, {
-      precioTotal_Venta: totalVenta,
-      Id_cliente: clienteSeleccionado,
-      Id_usuario: idUsuario,
-      Id_metodoPago: metodopagoseleccionado,
-      productos: productosParaBackend
-    })
-    .then((response) => {
+      // 1️⃣ Validar límite de crédito si es venta a crédito
+      if (parseInt(metodopagoseleccionado) === 5 && nuevoCredito > limiteCredito) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Límite de crédito superado',
+          html: `
+            <ul style="text-align:left">
+              <li>Límite de crédito del cliente: <b>${formatCurrency(limiteCredito)}</b></li>
+              <li>Total de esta venta: <b>${formatCurrency(totalConInteres)}</b></li>
+              <li>Crédito actual: <b>${formatCurrency(creditoActual)}</b></li>
+              <li>Excedido por: <b>${formatCurrency(nuevoCredito - limiteCredito)}</b></li>
+            </ul>
+          `
+        });
+        return; // No registrar la venta ni descontar stock
+      }
+
+      // 2️⃣ Preparar productos para enviar al backend
+      const productosParaBackend = carrito.map(item => ({
+        Id_producto: item.Id_producto,
+        Id_lote: item.lote.Id_lote,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio
+      }));
+
+      // 3️⃣ Registrar la venta
+      const resVenta = await axios.post(`${URL}venta/registrarVenta`, {
+        precioTotal_Venta: totalVenta,
+        Id_cliente: clienteSeleccionado,
+        Id_usuario: idUsuario,
+        Id_metodoPago: metodopagoseleccionado,
+        productos: productosParaBackend
+      });
+      const Id_venta = resVenta.data.Id_venta;
+
+      // 4️⃣ Si es venta a crédito, actualizar crédito y registrar movimiento
+      if (parseInt(metodopagoseleccionado) === 5) {
+        await axios.put(`${URL}clientes/aumentarCredito`, {
+          Id_cliente: parseInt(clienteSeleccionado),
+          monto_credito: Number(totalConInteres.toFixed(2))
+        });
+
+        await axios.post(`${URL}credito/movimientosclientes/registrar`, {
+          Id_cliente: parseInt(clienteSeleccionado),
+          montoCredito: Number(totalConInteres.toFixed(2)),
+          montoDebito: 0,
+          Id_venta: parseInt(Id_venta),
+          Saldo: Number(nuevoCredito.toFixed(2))
+        });
+
+        console.log("Crédito actualizado y movimiento registrado correctamente");
+      }
+
+      // 5️⃣ Imprimir ticket o mostrar confirmación
       if (result.isConfirmed) {
         imprimirTicket({ carrito, clientes, clienteSeleccionado, metodospago, metodopagoseleccionado, formatCurrency });
         Swal.fire({
           icon: 'success',
-          title: '¡Venta registrada e imprimida!',
+          title: '¡Venta registrada e impresa!',
           timer: 3000,
           showConfirmButton: false
         });
@@ -148,18 +208,23 @@ const FinalizarVenta = () => {
           showConfirmButton: false
         });
       }
+
+      // 6️⃣ Limpiar campos
       limpiarCampos();
-    })
-    .catch((error) => {
-      console.error('Error al registrar la venta', error);
+
+    } catch (error) {
+      console.error("Error al finalizar la venta:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Ocurrió un error al registrar la venta.',
+        text: 'Ocurrió un error al registrar la venta o el crédito.',
       });
-    });
+    }
   });
 };
+
+
+
 
 
 
@@ -493,7 +558,14 @@ useEffect(()=>{
           <Card.Body>
             <Form.Group className="mb-3">
               <Form.Label>Cliente</Form.Label>
-              <Form.Select value={clienteSeleccionado} onChange={(e) => setClienteSeleccionado(e.target.value)}>
+            <Form.Select
+                value={clienteSeleccionado}
+                onChange={(e) => {
+                  const Id_Cliente = e.target.value;
+                  setClienteSeleccionado(Id_Cliente);
+                  seleccionarCliente(Id_Cliente); 
+                }}
+              >
                 {clientes.map((cl) => (
                   <option key={cl.Id_cliente} value={cl.Id_cliente}>
                     {cl.nombre_cliente}

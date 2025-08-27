@@ -142,52 +142,86 @@ verDroguerias()
             <h3>DROGUERIAS</h3>
         </div>
         <br />
-        <h2 className='text-center'>ADMINISTRACION DE DROGUERIAS</h2>
-        <h4 className='text-center'>Gestiona todas las droguerias con las que se trabaja de manera centralizada.</h4>
+
+          <div style={{textAlign: 'center', marginTop: '20px'}}>
+            <h3>ADMINISTRACION DE DROGUERIAS</h3>
+            <h5>Gestiona todas las droguerias con las que se trabaja de manera centralizada.</h5>
+          </div>
+          <br />
 
         {/* INPUTS */}
         {/* NOMBRE */}
         <div className='container-fluid'>
           <div className='container'>
    
+     <div className="mb-3">
+             <small className="text-muted d-block mb-1">
+               <FontAwesomeIcon icon={faUser} className="me-1" />
+               NOMBRE 
+             </small>
          <MDBInputGroup className='mb-3'>
         <span className='input-group-text'>
             <FontAwesomeIcon icon={faUser} size="lg" style={{color: "#ff5e5e"}}/>
         </span>
-        <input className='form-control' type="text" placeholder='Ingrese nombre...' value={nombre_drogueria} onChange={(e) => setNombreDrogueria(e.target.value.toUpperCase())}/>
+        <input className='form-control' type="text" placeholder='Ej: Drogueria Suiza' value={nombre_drogueria} onChange={(e) => setNombreDrogueria(e.target.value.toUpperCase())}/>
          </MDBInputGroup>
+     </div>
 
          {/* CUIT */}
-           <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faIdCard} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese cuit...' value={cuit_drogueria} onChange={(e) => setCuitDrogueria(e.target.value.toUpperCase())}/>
-         </MDBInputGroup>
+          <div className="mb-3">
+                  <small className="text-muted d-block mb-1">
+                    <FontAwesomeIcon icon={faIdCard} className="me-1" />
+                    CUIT
+                  </small>
+                  <MDBInputGroup className='mb-3'>
+                    <span className='input-group-text'>
+                        <FontAwesomeIcon icon={faIdCard} size="lg" style={{color: "#ff5e5e"}}/>
+                    </span>
+                    <input className='form-control' type="text" placeholder='Ej: 20-4235589-9' value={cuit_drogueria} onChange={(e) => setCuitDrogueria(e.target.value.toUpperCase())}/>
+                </MDBInputGroup>
+         </div>
 
          {/* TELEFONO */}
-         <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faPhone} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese telefono...' value={telefono_drogueria} onChange={(e) => setTelefonoDrogueria(e.target.value)}/>
-         </MDBInputGroup>
+        <div className="mb-3">
+                  <small className="text-muted d-block mb-1">
+                    <FontAwesomeIcon icon={faPhone} className="me-1" />
+                    TELEFONO
+                  </small>
+                  <MDBInputGroup className='mb-3'>
+                  <span className='input-group-text'>
+                      <FontAwesomeIcon icon={faPhone} size="lg" style={{color: "#ff5e5e"}}/>
+                  </span>
+                  <input className='form-control' type="text" placeholder='Ej: 3815478963' value={telefono_drogueria} onChange={(e) => setTelefonoDrogueria(e.target.value)}/>
+                  </MDBInputGroup>
+         </div>
 
          {/* DIRECCION */}
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faLocationDot} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese direccion...' value={direccion_drogueria} onChange={(e) => setDireccionDrogueria(e.target.value.toUpperCase())}/>
-         </MDBInputGroup>
+           <div className="mb-3">
+                  <small className="text-muted d-block mb-1">
+                    <FontAwesomeIcon icon={faLocationDot} className="me-1" />
+                    DIRECCION
+                  </small>
+                  <MDBInputGroup className='mb-3'>
+                  <span className='input-group-text'>
+                      <FontAwesomeIcon icon={faLocationDot} size="lg" style={{color: "#ff5e5e"}}/>
+                  </span>
+                  <input className='form-control' type="text" placeholder='Ej: Av Mate de Luna 2500' value={direccion_drogueria} onChange={(e) => setDireccionDrogueria(e.target.value.toUpperCase())}/>
+                  </MDBInputGroup>
+            </div>
 
          {/* CORREO */}
-        <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faEnvelope} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese correo...' value={correo_drogueria} onChange={(e) => setCorreoDrogueria(e.target.value)}/>
-         </MDBInputGroup>
+          <div className="mb-3">
+                  <small className="text-muted d-block mb-1">
+                    <FontAwesomeIcon icon={faEnvelope} className="me-1" />
+                    CORREO
+                  </small>
+                  <MDBInputGroup className='mb-3'>
+                  <span className='input-group-text'>
+                      <FontAwesomeIcon icon={faEnvelope} size="lg" style={{color: "#ff5e5e"}}/>
+                  </span>
+                  <input className='form-control' type="text" placeholder='Ej: drogueriasuiza@gmail.com' value={correo_drogueria} onChange={(e) => setCorreoDrogueria(e.target.value)}/>
+                  </MDBInputGroup>
+         </div>
      </div>
 </div>
          <div className='col-12 d-flex justify-content-center'>

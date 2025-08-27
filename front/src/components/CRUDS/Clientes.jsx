@@ -218,67 +218,109 @@ useEffect(()=> {
 </div>
     <div className='container-fluid'>
         <div className='container'><br />
-            <h2 className='text-center'>ADMINISTRACION DE CLIENTES</h2>
+            <h3 className='text-center'>ADMINISTRACION DE CLIENTES</h3>
             <h4 className='text-center'>Gestiona todos los clientes de tu negocio.</h4>
     </div>
 <br />
 
         {/* INPUTS */}
         {/* NOMBRE */}
-            <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faUser} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese nombre...' value={nombre_cliente} onChange={(e) => setNombreCliente(e.target.value.toUpperCase())}/>
-            </MDBInputGroup>
+        <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faUser} className="me-1" />
+                  NOMBRE USUARIO
+                </small>
+                    <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faUser} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: Jorge' value={nombre_cliente} onChange={(e) => setNombreCliente(e.target.value.toUpperCase())}/>
+                    </MDBInputGroup>
+        </div>
 
         {/* APELLIDO */}
-            <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faUserCircle} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese apellido...' value={apellido_cliente} onChange={(e) => setApellidoCliente(e.target.value.toUpperCase())}/>
-            </MDBInputGroup>
+         <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faUserCircle} className="me-1" />
+                  APELLIDO USUARIO
+                </small>
+                    <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faUserCircle} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: Lopez' value={apellido_cliente} onChange={(e) => setApellidoCliente(e.target.value.toUpperCase())}/>
+                    </MDBInputGroup>
+        </div>
 
         {/* TELEFONO */}
-            <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faPhone} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese telefono...' value={telefono_cliente} onChange={(e) => setTelefonoCliente(e.target.value)}/>
-            </MDBInputGroup>
+         <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faPhone} className="me-1" />
+                  TELEFONO
+                </small>
+                    <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faPhone} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: 3815903789' value={telefono_cliente} onChange={(e) => setTelefonoCliente(e.target.value)}/>
+                    </MDBInputGroup>
+        </div>
 
         {/* CASA */}
-            <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faHome} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese domicilio...'  value={domicilio_cliente} onChange={(e) => setDomicilioCliente(e.target.value.toUpperCase())}/>
-            </MDBInputGroup>
+         <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faHome} className="me-1" />
+                  DOMICILIO
+                </small>
+                    <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faHome} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: Las Heras 154'  value={domicilio_cliente} onChange={(e) => setDomicilioCliente(e.target.value.toUpperCase())}/>
+                    </MDBInputGroup>
+        </div>
 
         {/* DOCUMENTO */}
-            <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faIdCard} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="text" placeholder='Ingrese documento...' value={documento_cliente} onChange={(e)=> setDocumentoCliente(e.target.value)}/>
-            </MDBInputGroup>
+         <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faIdCard} className="me-1" />
+                  DOCUMENTO
+                </small>
+                    <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faIdCard} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="text" placeholder='Ej: 43.431.247' value={documento_cliente} onChange={(e)=> setDocumentoCliente(e.target.value)}/>
+                    </MDBInputGroup>
+        </div>
 
         {/* MONTO CREDITO */}
+        <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faMoneyBill1} className="me-1" />
+                  MONTO CREDITO
+                </small>
             <MDBInputGroup className='mb-3'>
         <span className='input-group-text'>
             <FontAwesomeIcon icon={faMoneyBill1} size="lg" style={{color: "#ff5e5e"}}/>
         </span>
-        <input className='form-control' type="number" placeholder='Ingrese monto credito...' value={monto_credito} onChange={(e)=> setMontoCredito(e.target.value)}/>
+        <input className='form-control' type="number" placeholder='Debe ser menor que el limite!' value={monto_credito} onChange={(e)=> setMontoCredito(e.target.value)}/>
             </MDBInputGroup>
+        </div>
 
         {/* LIMITE CREDITO */}
-            <MDBInputGroup className='mb-3'>
-        <span className='input-group-text'>
-            <FontAwesomeIcon icon={faCreditCard} size="lg" style={{color: "#ff5e5e"}}/>
-        </span>
-        <input className='form-control' type="number" placeholder='Ingrese limite credito...' value={limite_credito} onChange={(e)=> setLimiteCredito(e.target.value)}/>
-            </MDBInputGroup>
+          <div className="mb-4">
+                <small className="text-muted d-block mb-1">
+                  <FontAwesomeIcon icon={faCreditCard} className="me-1" />
+                  LIMITE CREDITO
+                </small>
+                    <MDBInputGroup className='mb-3'>
+                <span className='input-group-text'>
+                    <FontAwesomeIcon icon={faCreditCard} size="lg" style={{color: "#ff5e5e"}}/>
+                </span>
+                <input className='form-control' type="number" placeholder='Maximo a otorgar al cliente' value={limite_credito} onChange={(e)=> setLimiteCredito(e.target.value)}/>
+                    </MDBInputGroup>
+        </div>
         </div>
 
      <div className='col-12 d-flex justify-content-center'>
@@ -329,7 +371,7 @@ useEffect(()=> {
                             <td>{val.telefono_cliente}</td>
                             <td>{val.domicilio_cliente}</td>
                             <td>{val.documento_cliente}</td>
-                            <td>{val.monto_credito}</td>
+                            <td>{formatCurrency(val.monto_credito)}</td>
                             <td>{formatCurrency(val.limite_credito)}</td>
                             <td>
                             <ButtonGroup>
