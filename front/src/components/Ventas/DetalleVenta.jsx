@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 
-const DetalleCompra = () => {
+const DetalleVenta = () => {
 
 
 //URL
@@ -16,7 +16,6 @@ const { URL } = useContext(DataContext)
 
 //ESTADOS
 const [detalleventa, setDetalleVenta] = useState([])
-const [ventaxdia, setVentaXDia] = useState([])
 const [ver, setVer] = useState([]);
 const [buscardetalle, setBuscarDetalle] = useState('')
 
@@ -24,7 +23,7 @@ const [buscardetalle, setBuscarDetalle] = useState('')
 
 
 //TRAER DETALLES COMPRA COMPLETOS
-const verDetalleCompraCompleto = () => {
+const verDetalleVentaCompleto = () => {
     axios.get(`${URL}detalleventa/verDetalleVentaCompletoAgrupado`).then((response) => {
         console.log('Detalle de venta: ', response.data)
         setDetalleVenta(response.data)
@@ -35,13 +34,6 @@ const verDetalleCompraCompleto = () => {
     })
 }
 
-// const verTotalVentaXDia = (fecha) => {
-//     axios.get(`${URL}detalleventa/verTotalVentasXDia?fecha=${fecha}`).then((response)=> {
-//         setVentaXDia(response.data[0].total_ventas_dia)
-//     }).catch((err)=> {
-//         console.error('Error al obtener ventas x dia', err)
-//     })
-// }
 
   //FUNCION PARA PASAR A PESOS ARG
   const formatCurrency = (value) => {
@@ -51,11 +43,6 @@ const verDetalleCompraCompleto = () => {
     }).format(value);
   };
 
-//   const handleBuscar = () => {
-//   if (buscardetalle) {
-//     verTotalVentaXDia(buscardetalle); // <-- busca solo cuando se clickea
-//   }
-// }
 
  //FILTRO POR DETALLE
   const buscador = (e) => {
@@ -78,7 +65,7 @@ const verDetalleCompraCompleto = () => {
   const primerIndex = ultimoIndex - detalleporpagina;
 
 useEffect(()=>{
-    verDetalleCompraCompleto()
+    verDetalleVentaCompleto()
 },[])
 
 
@@ -92,7 +79,6 @@ useEffect(()=>{
         VISUALIZA LOS DETALLES DE VENTA COMPLETOS.
     </h2>
 
-    <p style={{marginLeft: '10px'}}>SUMA TOTAL DE VENTAS EN LA FECHA:  <strong>{formatCurrency(ventaxdia)}</strong></p>
 <br />
  <MDBInputGroup className='mb-3'>
                 <span className='input-group-text'>
@@ -116,6 +102,7 @@ useEffect(()=>{
       <th>PRODUCTO</th>
       <th>CANTIDAD</th>
       <th>TOTAL</th>
+      <th>METODO PAGO</th>
       <th>USUARIO QUE REGISTRO LA VENTA</th>
       <th>FECHA REGISTRO</th>
     </tr>
@@ -148,7 +135,7 @@ useEffect(()=>{
         <td data-label="Total" style={{ fontWeight: "700", color: "#182848", backgroundColor: '#8aeb9aff', width: '150px' }}>
           {formatCurrency(venta.precio_total)}
         </td>
-
+         <td className='columna-detallev-metodo'>{venta.metodo_pago}</td>
          <td className='columna-detallev-usuario'>{venta.usuario}</td>
          
         {/* Lista de fechas */}
@@ -169,4 +156,4 @@ useEffect(()=>{
   )
 }
 
-export default DetalleCompra
+export default DetalleVenta

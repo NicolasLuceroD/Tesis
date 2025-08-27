@@ -130,7 +130,7 @@ const FinalizarVenta = () => {
     cancelButtonColor: '#aaa'
   }).then(async (result) => {
     try {
-      const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+      const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0); 
       const interesNumero = parseFloat(interes) || 0;
       const totalConInteres = totalVenta + (totalVenta * interesNumero / 100);
 
@@ -139,7 +139,7 @@ const FinalizarVenta = () => {
       const nuevoCredito = creditoActual + totalConInteres;
 
       // 1️⃣ Validar límite de crédito si es venta a crédito
-      if (parseInt(metodopagoseleccionado) === 5 && nuevoCredito > limiteCredito) {
+      if (parseInt(metodopagoseleccionado) === 5 && nuevoCredito >= limiteCredito) {
         Swal.fire({
           icon: 'error',
           title: 'Límite de crédito superado',
@@ -222,10 +222,6 @@ const FinalizarVenta = () => {
     }
   });
 };
-
-
-
-
 
 
 

@@ -18,7 +18,7 @@ const verDetalleVentaCompletoAgrupado = (req, res) => {
     INNER JOIN venta v ON v.Id_venta = dv.Id_venta
     INNER JOIN productos p ON p.Id_producto = dv.Id_producto
     INNER JOIN metodopago mp ON mp.Id_metodoPago = v.Id_metodoPago
-    INNER JOIN usuarios u ON u.Id_usuario = v.Id_usuario  -- <-- join a usuarios
+    INNER JOIN usuarios u ON u.Id_usuario = v.Id_usuario
     ORDER BY v.Id_venta DESC, dv.Id_detalleventa;
   `, (error, results) => {
     if (error) {
@@ -53,16 +53,5 @@ const verDetalleVentaCompletoAgrupado = (req, res) => {
   });
 };
 
-
-// const verTotalVentasXDia = (req,res) => {
-//   const fecha = req.query.fecha
-//   connection.query(`SELECT 
-//                     SUM(precioTotal_Venta) AS total_ventas_dia
-//                     FROM venta
-//                     WHERE DATE(fecha_registro) = ?`,[fecha],(error,results) => {
-//                       if (error) throw error
-//                       res.json(results)
-//                     })
-// }
 
 module.exports = {verDetalleVentaCompletoAgrupado}
