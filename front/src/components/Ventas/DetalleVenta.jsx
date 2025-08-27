@@ -103,6 +103,7 @@ useEffect(()=>{
       <th>CANTIDAD</th>
       <th>TOTAL</th>
       <th>METODO PAGO</th>
+      <th>CLIENTE</th>
       <th>USUARIO QUE REGISTRO LA VENTA</th>
       <th>FECHA REGISTRO</th>
     </tr>
@@ -136,6 +137,7 @@ useEffect(()=>{
           {formatCurrency(venta.precio_total)}
         </td>
          <td className='columna-detallev-metodo'>{venta.metodo_pago}</td>
+         <td className='columna-detallev-cliente'>{venta.nombre_cliente}</td>
          <td className='columna-detallev-usuario'>{venta.usuario}</td>
          
         {/* Lista de fechas */}

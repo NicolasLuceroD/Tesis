@@ -2,12 +2,13 @@ const { connection } = require("../database/config");
 
 const verDetalleVentaCompletoAgrupado = (req, res) => {
   connection.query(`
-   SELECT 
+SELECT 
       v.Id_venta,
       v.fecha_registro,
       v.precioTotal_Venta,
       v.Id_cliente,
       v.Id_usuario,
+      c.nombre_cliente AS nombre_cliente,
       u.nombre_usuario,
       dv.Id_detalleventa,
       dv.Id_producto,
@@ -19,7 +20,8 @@ const verDetalleVentaCompletoAgrupado = (req, res) => {
     INNER JOIN productos p ON p.Id_producto = dv.Id_producto
     INNER JOIN metodopago mp ON mp.Id_metodoPago = v.Id_metodoPago
     INNER JOIN usuarios u ON u.Id_usuario = v.Id_usuario
-    ORDER BY v.Id_venta DESC, dv.Id_detalleventa;
+    INNER JOIN clientes c ON c.Id_cliente = v.Id_cliente
+    ORDER BY v.Id_venta DESC, dv.Id_detalleventa
   `, (error, results) => {
     if (error) {
       console.error('Error al traer los detalles de venta:', error);
@@ -34,6 +36,7 @@ const verDetalleVentaCompletoAgrupado = (req, res) => {
           precio_total: item.precioTotal_Venta,
           metodo_pago: item.metodo_pago,
           usuario: item.nombre_usuario,
+          nombre_cliente: item.nombre_cliente,
           productos: []
         };
       }
