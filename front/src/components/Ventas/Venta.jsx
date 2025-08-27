@@ -350,6 +350,13 @@ const formatCurrency = (value) => {
     setMontoRecibido('')
   }
 
+  // ELIMINAR PRODUCTO DEL CARRITO
+  const eliminarDelCarrito = (index) => { //recibe como parametros index que seria el indice del producto A BORRAR en la tabla (lo manda el boton)
+    const carritoActualizado = carrito.filter((productoActual, posicionActual) => posicionActual !== index) 
+    setCarrito(carritoActualizado);
+  };
+
+  //FUNCIONES DE PRECIOS
   const totalVenta = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
   const interesNumero = parseFloat(interes) || 0
   const totalConInteres = totalVenta + (totalVenta * interesNumero / 100);
@@ -531,7 +538,7 @@ useEffect(()=>{
                         </td>
                         <td><b>{formatCurrency(item.precio * item.cantidad)}</b></td>
                         <td>
-                          <button className="btn btn-danger">
+                          <button className="btn btn-danger" onClick={() => eliminarDelCarrito(index)}>
                             <FontAwesomeIcon icon={faTrash} color="white" />
                           </button>
                         </td>

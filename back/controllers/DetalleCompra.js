@@ -17,7 +17,7 @@ const registrarDetalleCompra = (req,res) => {
 
 const verDetalleCompraCompletoAgrupado = (req, res) => {
   connection.query(`
-   SELECT 
+    SELECT 
       c.Id_compra,
       c.fecha_registro,
       c.Total,
@@ -26,11 +26,13 @@ const verDetalleCompraCompletoAgrupado = (req, res) => {
       dc.Cantidad,
       dc.Precio_costo,
       dc.Fecha_registro AS Fecha_registro,
-      p.nombre_producto
+      p.nombre_producto,
+      dr.nombre_drogueria AS nombre_drogueria
     FROM detallecompra dc
     INNER JOIN compra c ON c.Id_compra = dc.Id_compra
     INNER JOIN productos p ON p.Id_producto = dc.Id_producto
-    ORDER BY c.Id_compra DESC, dc.Id_detalleCompra;
+    INNER JOIN droguerias dr ON dr.Id_drogueria = c.Id_drogueria
+    ORDER BY c.Id_compra DESC, dc.Id_detalleCompra
   `, (error, results) => {
     if (error) {
       console.error('Error al traer los detalles de compra:', error);
@@ -43,6 +45,7 @@ const verDetalleCompraCompletoAgrupado = (req, res) => {
           Id_compra: item.Id_compra,
           fecha_registro: item.fecha_registro,
           precio_total: item.Total,
+          nombre_drogueria: item.nombre_drogueria,
           productos: []
         };
       }

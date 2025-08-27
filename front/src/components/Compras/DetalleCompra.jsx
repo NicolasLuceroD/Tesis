@@ -113,6 +113,7 @@ useEffect(()=>{
       <th>CANTIDAD</th>
       <th>PRECIO COSTO</th>
       <th>TOTAL</th>
+      <th>DROGUERIA</th>
       <th>FECHA REGISTRO</th>
     </tr>
   </thead>
@@ -151,9 +152,12 @@ useEffect(()=>{
         </td>
         
         {/* Total de la venta*/}
-        <td data-label="Total" style={{ fontWeight: "700", color: "#182848", backgroundColor: '#8aeb9aff' }}>
-          {formatCurrency(compra.precio_total)}
+        <td className='columna-detallec-precio'>
+          <b>{formatCurrency(compra.precio_total)}</b>
         </td>
+
+        {/* Nombre de */}
+        <td>{compra.nombre_drogueria}</td>
 
         {/* Lista de fechas */}
           <td>{new Date(compra.fecha_registro).toLocaleString()}</td>
