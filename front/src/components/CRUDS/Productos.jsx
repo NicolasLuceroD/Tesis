@@ -197,6 +197,33 @@ const handleProducto = (val) => {
     dato.codigobarras_producto.toLowerCase().includes(buscarproducto.toLocaleLowerCase())
   );
 
+
+//VERIFICAR SI YA EXISTE EL PRODUCTO
+const verificarCodigoProducto = (codigobarras) => {
+  const existe = verProductos.some((p) => p.codigobarras_producto === codigobarras)
+  if (existe) {
+    Swal.fire({
+      icon:  'error',
+      title: 'Código duplicado',
+      text: 'Este producto ya esta en el sistema'
+    })
+    return true
+  }
+  return false
+}
+
+
+const handleCodigoChange = (e) => {
+  const codigobarras = e.target.value;
+  setCodigobarras_producto(codigobarras)
+    if(codigobarras.length === 12) {
+      const existe = verificarCodigoProducto(codigobarras)
+        if(existe) {
+          setCodigobarras_producto("")
+        }
+    }
+}
+
 //PAGINACION NUEVA
 const productosPorPagina = 10
 const [actualPagina, setActualPagina] = useState(1)
@@ -242,7 +269,7 @@ useEffect(()=>{
             <span className="input-group-text">
               <FontAwesomeIcon icon={faBarcode} size="lg" style={{ color: "#ff5e5e" }} />
             </span>
-            <input className="form-control" type="text" placeholder="Ej: 750100000001" value={codigobarras_producto} onChange={(e) => setCodigobarras_producto(e.target.value)}/>
+            <input className="form-control" type="text" placeholder="Ej: 750100000001" value={codigobarras_producto} onChange={handleCodigoChange}/>
           </MDBInputGroup>
       </div>
 

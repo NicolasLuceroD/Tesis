@@ -18,7 +18,7 @@ const movimientosclientes = (req,res) =>{
 const verElCreditoCompleto = (req, res) => {
   const Id_cliente = req.params.Id_cliente;
   connection.query(
-    `SELECT v.Id_venta, v.precioTotal_Venta, v.fecha_registro, 
+    `SELECT v.Id_venta, v.precioTotal_Venta, v.fecha_registro, v.faltaPagar, 
             c.Id_cliente, c.nombre_cliente, c.monto_credito, 
             mp.nombre_metodopago, c.telefono_cliente, c.domicilio_cliente,
             p.Id_producto, p.nombre_producto, p.precio_caja, 
@@ -47,6 +47,7 @@ const verElCreditoCompleto = (req, res) => {
             Id_venta: item.Id_venta,
             precioTotal_Venta: item.precioTotal_Venta,
             fecha_registro: item.fecha_registro,
+            faltaPagar: item.faltaPagar,
             cliente: {
               Id_cliente: item.Id_cliente,
               nombre_cliente: item.nombre_cliente,

@@ -348,3 +348,7 @@
     transform: translateY(0);
   }
 }
+
+.contenedor-datos-creditos{
+  background-color: #ff5e5e;
+}

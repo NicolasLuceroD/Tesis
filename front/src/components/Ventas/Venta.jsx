@@ -137,6 +137,7 @@ const FinalizarVenta = () => {
       const cliente = clientes.find(c => c.Id_cliente === parseInt(clienteSeleccionado));
       const creditoActual = cliente ? parseFloat(cliente.monto_credito) : 0;
       const nuevoCredito = creditoActual + totalConInteres;
+      const faltaPagar = parseInt(metodopagoseleccionado) === 5 ? totalConInteres : 0;
 
       // 1️⃣ Validar límite de crédito si es venta a crédito
       if (parseInt(metodopagoseleccionado) === 5 && nuevoCredito >= limiteCredito) {
@@ -160,7 +161,8 @@ const FinalizarVenta = () => {
         Id_producto: item.Id_producto,
         Id_lote: item.lote.Id_lote,
         cantidad: item.cantidad,
-        precio_unitario: item.precio
+        tipoVenta: item.tipoPrecio,
+        precioAplicado: item.precio
       }));
 
       // 3️⃣ Registrar la venta
@@ -169,7 +171,8 @@ const FinalizarVenta = () => {
         Id_cliente: clienteSeleccionado,
         Id_usuario: idUsuario,
         Id_metodoPago: metodopagoseleccionado,
-        productos: productosParaBackend
+        productos: productosParaBackend,
+        faltaPagar: faltaPagar
       });
       const Id_venta = resVenta.data.Id_venta;
 

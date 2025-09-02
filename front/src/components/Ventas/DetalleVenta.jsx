@@ -101,6 +101,8 @@ useEffect(()=>{
       <th>FOLIO</th>
       <th>PRODUCTO</th>
       <th>CANTIDAD</th>
+      <th>PRECIO APLICADO</th>
+      <th>TIPO DE PRECIO</th>
       <th>TOTAL</th>
       <th>METODO PAGO</th>
       <th>CLIENTE</th>
@@ -131,12 +133,37 @@ useEffect(()=>{
             ))}
           </ul>
         </td>
+
+          {/* Precio aplicado */}
+        <td>
+          <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
+            {venta.productos.map((prod) => (
+              <li key={prod.Id_detalleventa}>
+                {formatCurrency(prod.precioAplicado)}
+              </li>
+            ))}
+          </ul>
+        </td>
+
+         {/* Tipo de precio */}
+        <td>
+          <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
+            {venta.productos.map((prod) => (
+              <li key={prod.Id_detalleventa}>
+                {(prod.tipoVenta)}
+              </li>
+            ))}
+          </ul>
+        </td>
         
         {/* Total de la venta*/}
         <td data-label="Total" style={{ fontWeight: "700", color: "#182848", backgroundColor: '#8aeb9aff', width: '150px' }}>
           {formatCurrency(venta.precio_total)}
         </td>
          <td className='columna-detallev-metodo'>{venta.metodo_pago}</td>
+
+      
+
          <td className='columna-detallev-cliente'>{venta.nombre_cliente}</td>
          <td className='columna-detallev-usuario'>{venta.usuario}</td>
          

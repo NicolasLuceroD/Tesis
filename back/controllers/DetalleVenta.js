@@ -13,6 +13,8 @@ SELECT
       dv.Id_detalleventa,
       dv.Id_producto,
       dv.cantidadVendida,
+      dv.precioAplicado,
+      dv.tipoVenta,
       p.nombre_producto AS nombre_producto,
       mp.nombre_metodopago AS metodo_pago
     FROM detalleventa dv
@@ -45,7 +47,9 @@ SELECT
         Id_detalleventa: item.Id_detalleventa,
         Id_producto: item.Id_producto,
         nombre_producto: item.nombre_producto,
-        cantidadVendida: item.cantidadVendida
+        cantidadVendida: item.cantidadVendida,
+        tipoVenta: item.tipoVenta,
+        precioAplicado: item.precioAplicado
       });
 
       return acc;
