@@ -4,6 +4,8 @@ import { Button, Modal, Table } from 'react-bootstrap'
 import { DataContext } from '../../context/DataContext'
 import { faCheck, faDollar, faEye } from '@fortawesome/free-solid-svg-icons'
 import { formatCurrency } from '../Utils/formatCurrency'
+import { scrollToEnd } from '../Utils/scrollToEnd'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import App from '../../App'
@@ -98,7 +100,13 @@ const primerIndex = ultimoIndex - clientesporpagina;
 //USEEFFECT
 useEffect(()=>{
   verClientes()
-},[])
+
+
+  //validacion para llevar abajo la pag
+  if (detalleCliente.length > 0 || ordenSeleccionada) {
+    scrollToEnd()
+  }
+},[detalleCliente,ordenSeleccionada])
 
 
   return (
@@ -221,6 +229,8 @@ useEffect(()=>{
       <th>FECHA</th>
       <th>PRODUCTOS</th>
       <th>CANTIDAD</th>
+      <th>SUBTOTAL X PRODUCTO</th>
+      <th>TIPO VENTA</th>
       <th>TOTAL VENTA</th>
       <th>TOTAL DEUDA</th>
       <th>COBRAR</th>
@@ -254,18 +264,38 @@ useEffect(()=>{
           </ul>
         </td>
 
+
+        {/* Subtotal x productos (precio aplicado) */}
+        <td>
+          <ul style={{ marginBottom: 0, paddingLeft: "20px" }}>
+            {venta.productos.map((prod, i) => (
+              <li key={i}>{formatCurrency(prod.precioAplicado)}</li>
+            ))}
+          </ul>
+        </td>
+
+        {/* Tipo venta */}
+         <td>
+          <ul style={{ marginBottom: 0, paddingLeft: "20px" }}>
+            {venta.productos.map((prod, i) => (
+              <li key={i}>{(prod.tipoVenta)}</li>
+            ))}
+          </ul>
+        </td>
+       
+
         {/* Total */}
-        <td>{formatCurrency(venta.precioTotal_Venta)}</td>
+        <td style={{backgroundColor: '#8aeb9aff', fontWeight: 'bold'}}>{formatCurrency(venta.precioTotal_Venta)}</td>
         
         {/* Falta pagar */}
-        <td>{formatCurrency(venta.faltaPagar)}</td>
+        <td style={{backgroundColor: '#fc908cda'}}>{formatCurrency(venta.faltaPagar)}</td>
       
 
         {/* Boton para cobrar */}
         <td>
-          <Button onClick={() => setOrdenSeleccionada(venta)}>
-            <FontAwesomeIcon icon={faCheck}/>
-          </Button>
+         <Button onClick={() => setOrdenSeleccionada(venta)}>
+            <FontAwesomeIcon icon={faCheck} />
+         </Button>
         </td>
       </tr>
     ))}
@@ -276,39 +306,60 @@ useEffect(()=>{
 
 {/* ORDEN DE COBRO SELECCIONADA */}
 {ordenSeleccionada && (
-  <div className="mt-5">
-    <h5 className="fw-bold text-primary">
-      Orden de cobro seleccionada: {ordenSeleccionada.Id_venta}
-    </h5>
-    <table className="table table-bordered table-striped mt-3 shadow-sm">
-      <thead>
-        <tr>
-          <th>PRODUCTOS</th>
-          <th>CANTIDAD</th>
-          <th>Precio Unitario</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        {ordenSeleccionada.productos.map((prod, idx) => (
-          <tr key={idx}>
-            <td>{prod.nombre_producto}</td>
-            <td>{parseInt(prod.cantidadVendida)}</td>
-            <td>{formatCurrency(prod.precio_caja)}</td>
-            <td>{formatCurrency(prod.cantidadVendida * prod.precio_caja)}</td>
+  <div className="container mt-5">
+
+    {/* Título */}
+    <div className="text-start mb-3">
+      <h5>Orden de cobro seleccionada: {ordenSeleccionada.Id_venta}</h5>
+    </div>
+
+    {/* Método de pago */}
+    <div className="mb-3">
+      <p className="mb-1 fw-semibold">Método de pago:</p>
+      <select className="form-select w-50">
+        <option value="efectivo">Efectivo</option>
+        <option value="tarjeta">Tarjeta</option>
+        <option value="transferencia">Transferencia</option>
+        <option value="mercadopago">MercadoPago</option>
+      </select>
+    </div>
+
+    {/* Tabla de productos */}
+    <div className="table-responsive">
+      <table className="table table-striped table-hover shadow-lg custom-table text-center">
+        <thead className='custom-table-header'>
+          <tr>
+            <th>PRODUCTOS</th>
+            <th>CANTIDAD</th>
+            <th>PRESENTACION</th>
+            <th>PRECIO PRESENTACIÓN</th>
+            <th>SUBTOTAL</th>
           </tr>
-        ))}
-        <tr>
-          <td colSpan={3} className="fw-bold text-end">Total</td>
-          <td className="fw-bold text-success">
-            {formatCurrency(ordenSeleccionada.precioTotal_Venta)}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {ordenSeleccionada.productos.map((prod, idx) => (
+            <tr key={idx}>
+              <td>{prod.nombre_producto}</td>
+              <td>{parseInt(prod.cantidadVendida)}</td>
+              <td>{prod.tipoVenta}</td>
+              <td>{formatCurrency(prod.precioAplicado)}</td>
+              <td>{formatCurrency(prod.precioAplicado * prod.cantidadVendida)}</td>
+            </tr>
+          ))}
+          <tr>
+            <td colSpan={4} className="fw-bold text-end">TOTAL</td>
+            <td className="fw-bold text-success">
+              {formatCurrency(ordenSeleccionada.precioTotal_Venta)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <Button>Generar orden de cobro</Button>
+    </div>
   </div>
 )}
 
+<ScrollToTopButton />
     </>
   )
 }

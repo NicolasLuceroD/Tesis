@@ -1,17 +1,17 @@
-import React from 'react'
 import {useState, useEffect, useContext} from 'react'
 import { DataContext } from "../../context/DataContext";
-import App from '../../App'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faCreditCard, faIdCard, faMap, faMoneyBill1, faUser, faUserCircle, faTrashAlt } from '@fortawesome/free-regular-svg-icons'
 import { faHome, faPhone, faSearch } from '@fortawesome/free-solid-svg-icons'
-import axios from 'axios';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { scrollToTop } from '../Utils/scroll';
+import App from '../../App'
+import axios from 'axios';
 import Paginacion from '../Common/Paginacion';
 import Swal from 'sweetalert2';
-import { scrollToTop } from '../Utils/scroll';
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const Clientes = () => {
 
@@ -393,6 +393,7 @@ useEffect(()=> {
             </div>
         </div>
     </div>
+    <ScrollToTopButton />
 </>
   )
 }

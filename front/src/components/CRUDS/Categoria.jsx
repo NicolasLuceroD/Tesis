@@ -1,15 +1,16 @@
 import { useState, useContext, useEffect } from 'react';
-import App from '../../App'
 import {MDBInputGroup} from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboard, faPenToSquare, faTrashAlt} from '@fortawesome/free-regular-svg-icons';
 import { Button, ButtonGroup } from "react-bootstrap"
 import { DataContext } from "../../context/DataContext";
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { scrollToTop } from '../Utils/scroll';
+import App from '../../App'
 import axios from 'axios'
 import Paginacion from '../Common/Paginacion';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
-import { scrollToTop } from '../Utils/scroll';
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 
 const Categoria = () => {
@@ -263,6 +264,7 @@ useEffect(()=>{
           </div>
         </div>
 </div>
+<ScrollToTopButton />
     </>
   )
 }

@@ -1,14 +1,15 @@
 import { Container, Row, Col, Form, Table, Button, Card } from 'react-bootstrap';
 import { MDBInputGroup } from 'mdb-react-ui-kit';
 import { useState, useEffect, useContext, useRef } from 'react';
-import App from '../../App'
 import { DataContext } from '../../context/DataContext';
-import axios from 'axios';
-import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDollar, faFilePrescription, faSearch, faShoppingCart, faTrash } from '@fortawesome/free-solid-svg-icons';
-import Paginacion from '../Common/Paginacion';
 import { imprimirTicket } from '../Utils/ImprimirTicket';
+import App from '../../App'
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import Paginacion from '../Common/Paginacion';
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const Venta = () => {
 
@@ -624,6 +625,7 @@ useEffect(()=>{
       </Col>
     </Row>
   </Container>
+  <ScrollToTopButton />
 </>
   )
 }

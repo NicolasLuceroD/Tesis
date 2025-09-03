@@ -1,12 +1,12 @@
 import { useState, useContext, useEffect } from 'react'
-import App from '../../App'
-import { DataContext } from '../../context/DataContext'
-import axios from 'axios'
-import Paginacion from '../Common/Paginacion'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
-
+import { DataContext } from '../../context/DataContext'
+import App from '../../App'
+import axios from 'axios'
+import Paginacion from '../Common/Paginacion'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const DetalleCompra = () => {
 
@@ -173,6 +173,8 @@ useEffect(()=>{
                           total={total}
                       />
       </div>
+
+      <ScrollToTopButton />
     </>
   )
 }

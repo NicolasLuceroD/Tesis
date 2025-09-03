@@ -1,14 +1,15 @@
 import { useState, useEffect, useContext} from 'react'
-import App from '../../App'
+import { scrollToTop } from '../Utils/scroll'
 import { DataContext } from '../../context/DataContext'
 import { faBarcode, faClipboard, faDollar, faPenToSquare, faSearch, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import axios from 'axios'
 import { Button, ButtonGroup, Card } from 'react-bootstrap'
+import axios from 'axios'
+import App from '../../App'
 import Paginacion from "../Common/Paginacion";
 import Swal from 'sweetalert2'
-import { scrollToTop } from '../Utils/scroll'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const Productos = () => {
 
@@ -473,7 +474,7 @@ useEffect(()=>{
                     total={total}
                 />
         </div>
-
+<ScrollToTopButton />
     </>
   )
 }

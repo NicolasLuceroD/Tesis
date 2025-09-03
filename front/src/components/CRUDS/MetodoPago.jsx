@@ -1,13 +1,14 @@
 import { useContext, useState, useEffect } from 'react'
-import App from '../../App'
 import { DataContext } from '../../context/DataContext'
-import axios from 'axios'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faTrashAlt, faUser } from '@fortawesome/free-regular-svg-icons'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { faWallet } from '@fortawesome/free-solid-svg-icons'
 import { scrollToTop } from '../Utils/scroll'
+import App from '../../App'
+import axios from 'axios'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const MetodoPago = () => {
 
@@ -160,7 +161,7 @@ useEffect(()=>{
   </div>
  </div>
 
-
+<ScrollToTopButton />
     </>
   )
 }

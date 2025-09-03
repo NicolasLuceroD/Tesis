@@ -1,16 +1,17 @@
 import {useState, useEffect, useContext} from 'react'
 import { DataContext } from '../../context/DataContext'
-import App from '../../App'
-import axios from 'axios'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faPenToSquare, faTrashAlt, faUser } from '@fortawesome/free-regular-svg-icons'
 import { faKey, faUserShield, faEyeSlash, faCheck, faSearch } from '@fortawesome/free-solid-svg-icons'
 import {  Button, ButtonGroup, Modal } from 'react-bootstrap'
+import { scrollToTop } from '../Utils/scroll'
+import App from '../../App'
+import axios from 'axios'
 import Form from 'react-bootstrap/Form'; 
 import Paginacion from '../Common/Paginacion'
 import Swal from 'sweetalert2'
-import { scrollToTop } from '../Utils/scroll'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const Usuarios = () => {
 
@@ -401,6 +402,7 @@ useEffect(()=>{
         <Button onClick={(handleCloseModalUsuarios)}>CERRAR</Button>
       </Modal.Footer>
       </Modal>
+      <ScrollToTopButton />
     </>
   )
 }

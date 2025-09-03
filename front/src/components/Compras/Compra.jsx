@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import App from "../../App";
 import { useState, useEffect, useContext, useRef } from "react";
 import { DataContext } from "../../context/DataContext";
-import axios from "axios";
+import { generarPDF } from '../../pdf/PdfCompra';
 import { Button, ButtonGroup, Modal } from "react-bootstrap";
+import axios from "axios";
 import Paginacion from "../Common/Paginacion";
 import Swal from 'sweetalert2';
-import { generarPDF } from '../../pdf/PdfCompra';
+import App from "../../App";
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const Compra = () => {
 
@@ -708,6 +709,7 @@ const agregarProductoACompra = (producto) => {
           <Button onClick={handleCloseModalDetalleCompra}>CERRAR</Button>
         </Modal.Footer>
       </Modal>
+      <ScrollToTopButton />
     </>
   );
 };

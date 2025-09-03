@@ -22,7 +22,7 @@ const verElCreditoCompleto = (req, res) => {
             c.Id_cliente, c.nombre_cliente, c.monto_credito, 
             mp.nombre_metodopago, c.telefono_cliente, c.domicilio_cliente,
             p.Id_producto, p.nombre_producto, p.precio_caja, 
-            dv.cantidadVendida, dv.Id_detalleventa,
+            dv.cantidadVendida, dv.Id_detalleventa, dv.tipoVenta, dv.precioAplicado,
                     u.nombre_usuario
             FROM venta v
             JOIN clientes c ON v.Id_cliente = c.Id_cliente
@@ -80,6 +80,8 @@ const verElCreditoCompleto = (req, res) => {
             precio_caja: item.precio_caja,
             cantidadVendida: item.cantidadVendida,
             Id_detalleventa: item.Id_detalleventa,
+            precioAplicado: item.precioAplicado,
+            tipoVenta: item.tipoVenta
           });
         }
         return acc;

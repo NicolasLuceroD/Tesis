@@ -1,12 +1,12 @@
 import { useState, useContext, useEffect } from 'react'
-import App from '../../App'
 import { DataContext } from '../../context/DataContext'
-import axios from 'axios'
-import Paginacion from '../Common/Paginacion'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
-
+import App from '../../App'
+import axios from 'axios'
+import Paginacion from '../Common/Paginacion'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const DetalleVenta = () => {
 
@@ -101,7 +101,6 @@ useEffect(()=>{
       <th>FOLIO</th>
       <th>PRODUCTO</th>
       <th>CANTIDAD</th>
-      <th>PRECIO APLICADO</th>
       <th>TIPO DE PRECIO</th>
       <th>TOTAL</th>
       <th>METODO PAGO</th>
@@ -130,17 +129,6 @@ useEffect(()=>{
           <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
             {venta.productos.map((prod) => (
               <li key={prod.Id_detalleventa}>{parseInt(prod.cantidadVendida)}</li>
-            ))}
-          </ul>
-        </td>
-
-          {/* Precio aplicado */}
-        <td>
-          <ul style={{ paddingLeft: "20px", marginBottom: 0 }}>
-            {venta.productos.map((prod) => (
-              <li key={prod.Id_detalleventa}>
-                {formatCurrency(prod.precioAplicado)}
-              </li>
             ))}
           </ul>
         </td>
@@ -181,6 +169,7 @@ useEffect(()=>{
                           total={total}
                       />
       </div>
+      <ScrollToTopButton />
     </>
   )
 }

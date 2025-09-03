@@ -1,15 +1,16 @@
-import App from '../../App'
-import '../../App.css'
 import { useState, useEffect, useContext } from 'react'
 import { DataContext } from '../../context/DataContext'
-import axios from 'axios'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faIdCard, faPenToSquare, faTrashAlt, faUser } from '@fortawesome/free-regular-svg-icons'
 import { faLocationDot, faPhone, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { Button, ButtonGroup } from 'react-bootstrap'
-import Paginacion from "../Common/Paginacion";
 import { scrollToTop } from '../Utils/scroll'
+import App from '../../App'
+import '../../App.css'
+import Paginacion from "../Common/Paginacion";
+import axios from 'axios'
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const Droguerias = () => {
 
@@ -281,6 +282,7 @@ verDroguerias()
                     total={total}
                 />
             </div>
+            <ScrollToTopButton />
     </>
   )
 }

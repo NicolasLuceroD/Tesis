@@ -1,13 +1,14 @@
 import { useContext, useState, useEffect } from 'react'
-import App from '../App'
 import { DataContext } from '../context/DataContext'
-import axios from 'axios'
-import Paginacion from './Common/Paginacion'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { MDBInputGroup } from 'mdb-react-ui-kit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Row, Col, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import { Accordion } from "react-bootstrap";
+import ScrollToTopButton from './Utils/ScrollToTopButton'
+import App from '../App'
+import axios from 'axios'
+import Paginacion from './Common/Paginacion'
 
 const Stock = () => {
 
@@ -226,6 +227,7 @@ useEffect(()=>{
                     total={total}
                 />
             </div>
+            <ScrollToTopButton />
     </>
   )
 }
