@@ -350,8 +350,11 @@ const formatCurrency = (value) => {
     setClienteSeleccionado(1)
     setMetodopagoseleccionado('')
     setCarrito([])
-    verProductos()
+    // verProductos()
     setMontoRecibido('')
+    setBuscarProducto('')
+    setProductos([])
+    setTotal(0)
   }
 
   // ELIMINAR PRODUCTO DEL CARRITO
@@ -374,10 +377,42 @@ const formatCurrency = (value) => {
   const ultimoIndex = actualPagina * productosPorPagina;
   const primerIndex = ultimoIndex - productosPorPagina;
 
+
+
+
+//SOLO FIILTRAR PRODUCTOS CUANDO HAYA NOMBRE O CODIGO
+const buscarProductos = async (texto) => {
+  // Si el texto está vacío, vaciamos la lista y el total
+  if (!texto || texto.length === 0) {
+    setProductos([]);
+    setTotal(0);
+    return;
+}
+
+  // Hacemos la solicitud al backend
+  const respuesta = await axios.get(`${URL}productos/buscar/${texto}`);
+
+  // Agrupamos los productos por lote
+  const productosAgrupados = agruparProductosPorLote(respuesta.data);
+
+  // Actualizamos el estado
+  setProductos(productosAgrupados);
+  setTotal(respuesta.data.length);
+};
+
+
+
+//LIMPIAR INPUT BUSQUEDA
+const limpiarInputBusqueda = () => {
+  setBuscarProducto('')
+  setProductos([])
+  setTotal(0)
+}
+
 useEffect(()=>{
   verMetodosPagos()
   verClientes()
-  verProductos()
+  // verProductos()
 },[])
 
 
@@ -411,7 +446,7 @@ useEffect(()=>{
             <Card className="mb-3">
               <Card.Header>
                 <FontAwesomeIcon icon={faSearch} /> Búsqueda de productos
-                </Card.Header>
+              </Card.Header>
               <Card.Body>
                 <MDBInputGroup className="mb-3">
                   <span className="input-group-text">
@@ -422,20 +457,31 @@ useEffect(()=>{
                     type="text"
                     placeholder="Buscar producto o escanear código"
                     value={buscarproducto}
-                    onChange={buscador}
+                    onChange={(e) => {
+                      setBuscarProducto(e.target.value);
+                      buscarProductos(e.target.value);
+                    }}
                   />
+                  <Button variant='warning' onClick={limpiarInputBusqueda}>LIMPIAR</Button>
+                  {/* <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Buscar producto o escanear código"
+                    value={buscarproducto}
+                    onChange={buscador}
+                  /> */}
                 </MDBInputGroup>
 
                 <Table bordered hover size="sm" className="table table-striped table-hover mt-3 shadow-sm custom-table">
                   <thead>
                     <tr>
                       <th>PRODUCTO</th>
-                      <th>PRECIO</th>
+                      <th>PRECIOS</th>
                       <th>ACCIÓN</th>
                     </tr>
                   </thead>
                   <tbody>
-                      {productosFiltrados.slice(primerIndex, ultimoIndex).map((prod) => {
+                      {productos.map((prod) => {
                       /* Aca filtro los lotes que no esten vencidos*/
                       const lotesValidos = prod.lotes.filter(l => {
                         const diasRestantes = Math.ceil((new Date(l.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
@@ -478,12 +524,34 @@ useEffect(()=>{
                               </div>
                             )}
                           </td>
-                          <td>{formatCurrency(prod.precio_caja)}</td>
                           <td>
-                            <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
-                              +
-                            </Button>
-                          </td>
+                              <ul style={{ paddingLeft: "15px", margin: 0, listStyle: "none" }}>
+                                {prod.precio_unitario && (
+                                  <li style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <small>Unidad:</small>
+                                    <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_unitario)}</strong></small>
+                                  </li>
+                                )}
+                                {prod.precio_tira && (
+                                  <li style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <small>Tira:</small>
+                                    <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_tira)}</strong></small>
+                                  </li>
+                                )}
+                                {prod.precio_caja && (
+                                  <li style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <small>Caja:</small>
+                                    <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_caja)}</strong></small>
+                                  </li>
+                                )}
+                              </ul>
+                            </td>
+
+                            <td>
+                                  <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
+                                    +
+                                  </Button>
+                            </td>
                         </tr>
                       );
                     })}

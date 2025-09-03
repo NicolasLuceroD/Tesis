@@ -79,4 +79,32 @@ const productosConStock = (req,res) => {
                         })
 }
 
-module.exports={verProductos,crearProductos,editarProducto,eliminarProductos,productosConStock}
+//PRUEBA
+const buscarProductos = (req, res) => {
+    const { texto } = req.params;
+    connection.query(`SELECT 
+                            l.Id_lote,
+                            l.Id_producto,
+                            p.nombre_producto,
+                            p.codigobarras_producto,
+                            l.cantidad_disponible,
+                            l.fecha_vencimiento,
+                            l.nro_lote,
+                            p.precio_unitario,
+                            p.precio_tira,
+                            p.precio_caja
+                        FROM lotes l
+                        JOIN productos p ON l.Id_producto = p.Id_producto
+                        WHERE p.Estado = 1
+                        AND l.cantidad_disponible > 0
+                        AND (p.nombre_producto LIKE ? OR p.codigobarras_producto LIKE ?)
+                        ORDER BY l.Id_producto, l.fecha_vencimiento ASC`,[`%${texto}%`, `%${texto}%`],
+                        (error, results) => {
+                            if (error) throw error;
+                            res.json(results);
+                        }
+    );
+};
+
+
+module.exports={verProductos,crearProductos,editarProducto,eliminarProductos,productosConStock,buscarProductos}
