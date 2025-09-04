@@ -63,5 +63,15 @@ const aumentarCredito = (req,res) => {
     })
 }
 
+const actualizarCredito = (req,res) => {
+    const { id } = req.params
+    const { monto_credito } = req.body
 
-module.exports={verClientes,crearClientes,editarClientes,eliminarCliente,aumentarCredito}
+    connection.query(`UPDATE clientes SET monto_credito = ? WHERE Id_cliente = ?`, [monto_credito, id], (err,results) => {
+        if (err) throw err
+        res.json(results)
+    })
+}
+
+
+module.exports={verClientes,crearClientes,editarClientes,eliminarCliente,aumentarCredito,actualizarCredito}

@@ -63,4 +63,15 @@ const registrarVenta = (req, res) => {
   });
 };
 
-module.exports = { registrarVenta };
+
+const actualizarFaltaPagar = (req,res) => {
+  const { id } = req.params
+  const { faltaPagar } = req.body
+
+  connection.query(`UPDATE venta SET faltaPagar = ? WHERE Id_venta = ?`,[faltaPagar, id], (err,result) => {
+    if (err) throw err
+    res.json(result)
+  })
+}
+
+module.exports = { registrarVenta,actualizarFaltaPagar };

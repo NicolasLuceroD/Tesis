@@ -18,14 +18,17 @@ const CreditosClientes = () => {
 //ESTADOS
 const [clientes, setClientes] = useState([])
 const [detalleCliente, setDetalleCliente] = useState([])
+const [metodospago, setMetodosPago] = useState([])
 const [montoCredito, setMontoCredito] = useState('')
 const [telefono, setTelefono] = useState('')
 const [idCliente, setIdCliente] = useState('')
 const [nombreCliente, setNombreCliente] = useState('')
 const [domicilioCliente, setDomicilioCliente]= useState('')
 const [clienteEncontrado, setClienteEncontrado] = useState(0)
+const [monto, setMonto] = useState(0)
 const [showModalClientes, setShowModalClientes] = useState(false)
 const [ordenSeleccionada, setOrdenSeleccionada] = useState(null)
+const [metodopagoseleccionado, setMetodoPagoSeleccionado] = useState('')
 
 
 //FILTRO BUSCAR CLIENTE
@@ -35,6 +38,10 @@ const [ver, setVer] = useState([])
 //URL
 const { URL } = useContext(DataContext)
 
+//LOCALSTORAGE
+const idUsuario = localStorage.getItem('idUsuario')
+
+//MODALES
 const handleShowModalClientes = () => setShowModalClientes(true)
 const handleCloseModalClientes = () => setShowModalClientes(false)
 
@@ -57,7 +64,6 @@ const verClientes = () => {
 const obtenerDetalleClienteVenta = (Id_cliente) => {
   axios.get(`${URL}credito/verElCreditoCompleto/${Id_cliente}`)
     .then((response) => {
-      console.log('Respuesta del backend:', response.data)
       if (response.data.length === 0) {
         Swal.fire('No hay deudas pendientes', '', 'info');
       } else {
@@ -75,6 +81,67 @@ const obtenerDetalleClienteVenta = (Id_cliente) => {
       console.log('error al obtener el detalle', error);
     });
 };
+
+//TRAER METODOS DE PAGO
+const verMetodosDePago = () => {
+  axios.get(`${URL}metodopago/verMetodoPago`).then((response) => {
+    console.log('Metodos de p: ', response.data)
+    setMetodosPago(response.data)
+  }).catch((err) => {
+    console.error('Error al traer los metodos de pago',err)
+  })
+}
+
+
+//REGISTRAR PAGO
+const registrarPago = () => {
+  if (!monto || monto <= 0) {
+    Swal.fire("Error", "Debe ingresar un monto válido", "error");
+    return;
+  }
+  if (!metodopagoseleccionado) {
+    Swal.fire("Error", "Debe seleccionar un método de pago", "error");
+    return;
+  }
+
+  // 1️⃣ Registrar pago en pagosclientes
+  axios.post(`${URL}credito/registrarPago/registrar`, {
+    monto: monto,
+    Id_metodoPago: parseInt(metodopagoseleccionado),
+    Id_cliente: idCliente,
+    Id_venta: ordenSeleccionada.Id_venta,
+    Id_usuario: idUsuario,
+    observacion: 'test'
+  })
+  .then(() => {
+    // 2️⃣ Actualizar faltaPagar en ventas
+    const nuevoFaltaPagar = ordenSeleccionada.faltaPagar - monto;
+
+    return axios.put(`${URL}venta/actualizarFaltaPagar/${ordenSeleccionada.Id_venta}`, {
+      faltaPagar: nuevoFaltaPagar
+    });
+  })
+  .then(() => {
+    // 3️⃣ Actualizar monto_credito en clientes
+    const nuevoCredito = montoCredito - monto;
+
+    return axios.put(`${URL}clientes/actualizarCredito/${idCliente}`, {
+      monto_credito: nuevoCredito
+    });
+  })
+  .then(() => {
+    Swal.fire("Éxito", "El pago se registró y las deudas se actualizaron", "success");
+    obtenerDetalleClienteVenta(idCliente);
+    setMonto(0);
+    setMetodoPagoSeleccionado('');
+    setOrdenSeleccionada(null);
+  })
+  .catch((err) => {
+    console.error("Error en el proceso de registrar pago:", err);
+    Swal.fire("Error", "No se pudo completar la operación", "error");
+  });
+};
+
 
 
 
@@ -100,13 +167,14 @@ const primerIndex = ultimoIndex - clientesporpagina;
 //USEEFFECT
 useEffect(()=>{
   verClientes()
-
+  verMetodosDePago()
 
   //validacion para llevar abajo la pag
   if (detalleCliente.length > 0 || ordenSeleccionada) {
     scrollToEnd()
   }
 },[detalleCliente,ordenSeleccionada])
+
 
 
   return (
@@ -315,18 +383,24 @@ useEffect(()=>{
 
     {/* Método de pago */}
     <div className="mb-3">
-      <p className="mb-1 fw-semibold">Método de pago:</p>
-      <select className="form-select w-50">
-        <option value="efectivo">Efectivo</option>
-        <option value="tarjeta">Tarjeta</option>
-        <option value="transferencia">Transferencia</option>
-        <option value="mercadopago">MercadoPago</option>
-      </select>
+      <div className="d-flex align-items-center gap-2">
+        <p className="mb-1 fw-semibold">Método de pago:</p>
+        <select className="form-select" style={{ width: '30%' }} value={metodopagoseleccionado} onChange={(e) => setMetodoPagoSeleccionado(e.target.value)}>
+            <option value="">Seleccione un método de pago</option>
+              {metodospago.filter((mp) => mp.Id_metodoPago !== 5).map((mp) => (
+                  <option key={mp.Id_metodoPago} value={mp.Id_metodoPago}>
+                    {mp.nombre_metodopago}
+                  </option>
+              ))}
+          </select>
+        <p className="mb-1 fw-semibold">Abona con:</p>
+        <input className="form-control" type="number" style={{ width: '30%' }} placeholder='$0,00' value={monto} onChange={(e) => setMonto(Number(e.target.value))}/>
+      </div>
     </div>
 
     {/* Tabla de productos */}
     <div className="table-responsive">
-      <table className="table table-striped table-hover shadow-lg custom-table text-center">
+    <table className="table table-striped table-hover shadow-lg custom-table text-center">
         <thead className='custom-table-header'>
           <tr>
             <th>PRODUCTOS</th>
@@ -343,18 +417,25 @@ useEffect(()=>{
               <td>{parseInt(prod.cantidadVendida)}</td>
               <td>{prod.tipoVenta}</td>
               <td>{formatCurrency(prod.precioAplicado)}</td>
-              <td>{formatCurrency(prod.precioAplicado * prod.cantidadVendida)}</td>
+              <td><strong>{formatCurrency(prod.precioAplicado * prod.cantidadVendida)}</strong></td>
             </tr>
           ))}
+          {/* Fila TOTAL DE LA VENTA */}
           <tr>
-            <td colSpan={4} className="fw-bold text-end">TOTAL</td>
-            <td className="fw-bold text-success">
-              {formatCurrency(ordenSeleccionada.precioTotal_Venta)}
-            </td>
+            <td colSpan={4} className="fw-bold text-end">TOTAL DE LA VENTA</td>
+            <td className="fw-bold text-success">{formatCurrency(ordenSeleccionada.precioTotal_Venta)}</td>
+          </tr>
+          {/* Fila TOTAL DEUDA */}
+          <tr>
+            <td colSpan={4} className="fw-bold text-end">TOTAL DEUDA</td>
+            <td className="fw-bold text-danger">{formatCurrency(ordenSeleccionada.faltaPagar)}</td>
           </tr>
         </tbody>
-      </table>
-      <Button>Generar orden de cobro</Button>
+    </table>
+    <div className='d-flex justify-content-center mt-5'>
+      <Button onClick={registrarPago}>Generar orden de cobro</Button>
+    </div>
+      
     </div>
   </div>
 )}

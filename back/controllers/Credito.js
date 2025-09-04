@@ -94,5 +94,21 @@ const verElCreditoCompleto = (req, res) => {
   );
 };
 
+const registrarPago = (req,res) => {
+  connection.query('INSERT INTO pagosclientes SET ?',   
+  {
+    Id_pago: req.body.Id_pago,
+    Id_cliente: req.body.Id_cliente,
+    Id_venta: req.body.Id_venta,
+    Id_metodoPago: req.body.Id_metodoPago,
+    Id_usuario: req.body.Id_usuario,
+    monto: req.body.monto,
+    observacion: 'test'
+  }, (error,results) => {
+    if (error) throw error
+    res.json(results)
+  })
+} 
 
-module.exports = {movimientosclientes, verElCreditoCompleto}
+
+module.exports = {movimientosclientes, verElCreditoCompleto,registrarPago}
