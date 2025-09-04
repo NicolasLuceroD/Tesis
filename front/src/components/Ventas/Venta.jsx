@@ -11,6 +11,8 @@ import Swal from 'sweetalert2';
 import Paginacion from '../Common/Paginacion';
 import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
+
+
 const Venta = () => {
 
 //URL

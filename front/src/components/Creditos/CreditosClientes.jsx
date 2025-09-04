@@ -5,13 +5,16 @@ import { DataContext } from '../../context/DataContext'
 import { faCheck, faDollar, faEye } from '@fortawesome/free-solid-svg-icons'
 import { formatCurrency } from '../Utils/formatCurrency'
 import { scrollToEnd } from '../Utils/scrollToEnd'
+import { QRCodeCanvas } from "qrcode.react";
 import ScrollToTopButton from '../Utils/ScrollToTopButton'
+import jsPDF from 'jspdf';
+import autoTable from "jspdf-autotable";
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import App from '../../App'
 import Paginacion from '../Common/Paginacion'
-import { QRCodeCanvas } from "qrcode.react";
-
+import logo from '../../assets/LogoNobel.jpg';
+import { PdfPagosClientes } from '../../pdf/PdfPagosClientes'
 
 const CreditosClientes = () => {
 
@@ -25,10 +28,13 @@ const [idCliente, setIdCliente] = useState('')
 const [nombreCliente, setNombreCliente] = useState('')
 const [domicilioCliente, setDomicilioCliente]= useState('')
 const [clienteEncontrado, setClienteEncontrado] = useState(0)
-const [monto, setMonto] = useState(0)
-const [showModalClientes, setShowModalClientes] = useState(false)
+const [monto, setMonto] = useState('')
 const [ordenSeleccionada, setOrdenSeleccionada] = useState(null)
 const [metodopagoseleccionado, setMetodoPagoSeleccionado] = useState('')
+
+
+//MODALES
+const [showModalClientes, setShowModalClientes] = useState(false)
 
 
 //FILTRO BUSCAR CLIENTE
@@ -66,6 +72,10 @@ const obtenerDetalleClienteVenta = (Id_cliente) => {
     .then((response) => {
       if (response.data.length === 0) {
         Swal.fire('No hay deudas pendientes', '', 'info');
+        setDetalleCliente([])
+        setOrdenSeleccionada(null)
+        setClienteEncontrado(0)
+
       } else {
         setDetalleCliente(response.data);
         setMontoCredito(response.data[0].cliente.monto_credito);
@@ -104,41 +114,66 @@ const registrarPago = () => {
     return;
   }
 
-  // 1️⃣ Registrar pago en pagosclientes
-  axios.post(`${URL}credito/registrarPago/registrar`, {
-    monto: monto,
-    Id_metodoPago: parseInt(metodopagoseleccionado),
-    Id_cliente: idCliente,
-    Id_venta: ordenSeleccionada.Id_venta,
-    Id_usuario: idUsuario,
-    observacion: 'test'
-  })
-  .then(() => {
-    // 2️⃣ Actualizar faltaPagar en ventas
-    const nuevoFaltaPagar = ordenSeleccionada.faltaPagar - monto;
+  Swal.fire({
+    title: '¿Querés generar un PDF?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, imprimir',
+    cancelButtonText: 'No',
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#aaa'
+  }).then((result) => {
+    const generarPDF = result.isConfirmed;
 
-    return axios.put(`${URL}venta/actualizarFaltaPagar/${ordenSeleccionada.Id_venta}`, {
-      faltaPagar: nuevoFaltaPagar
-    });
-  })
-  .then(() => {
-    // 3️⃣ Actualizar monto_credito en clientes
-    const nuevoCredito = montoCredito - monto;
+    // 1️⃣ Registrar pago en pagosclientes
+    axios.post(`${URL}credito/registrarPago/registrar`, {
+      monto: monto,
+      Id_metodoPago: parseInt(metodopagoseleccionado),
+      Id_cliente: idCliente,
+      Id_venta: ordenSeleccionada.Id_venta,
+      Id_usuario: idUsuario,
+      observacion: 'test'
+    })
+    .then(() => {
+      // 2️⃣ Actualizar faltaPagar en ventas
+      const nuevoFaltaPagar = ordenSeleccionada.faltaPagar - monto;
 
-    return axios.put(`${URL}clientes/actualizarCredito/${idCliente}`, {
-      monto_credito: nuevoCredito
+      return axios.put(`${URL}venta/actualizarFaltaPagar/${ordenSeleccionada.Id_venta}`, {
+        faltaPagar: nuevoFaltaPagar
+      });
+    })
+    .then(() => {
+      // 3️⃣ Actualizar monto_credito en clientes
+      const nuevoCredito = montoCredito - monto;
+
+      return axios.put(`${URL}clientes/actualizarCredito/${idCliente}`, {
+        monto_credito: nuevoCredito
+      });
+    })
+    .then(() => {
+      // Mostrar alerta de éxito
+      Swal.fire("Éxito", "El pago se registró y las deudas se actualizaron", "success")
+        .then(() => { 
+          setClienteEncontrado(0);
+          setMonto('');
+          setMetodoPagoSeleccionado('');
+          setOrdenSeleccionada(null);
+
+        // Generar pdf
+          if (generarPDF) {
+            PdfPagosClientes({ 
+              nombreCliente, 
+              telefono, 
+              monto, 
+              ordenSeleccionada 
+            });
+          }
+        });
+    })
+    .catch((err) => {
+      console.error("Error en el proceso de registrar pago:", err);
+      Swal.fire("Error", "No se pudo completar la operación", "error");
     });
-  })
-  .then(() => {
-    Swal.fire("Éxito", "El pago se registró y las deudas se actualizaron", "success");
-    obtenerDetalleClienteVenta(idCliente);
-    setMonto(0);
-    setMetodoPagoSeleccionado('');
-    setOrdenSeleccionada(null);
-  })
-  .catch((err) => {
-    console.error("Error en el proceso de registrar pago:", err);
-    Swal.fire("Error", "No se pudo completar la operación", "error");
   });
 };
 
@@ -289,7 +324,7 @@ useEffect(()=>{
 </div>
 
 <br />
-    <h5 className="mt-4">Ventas y movimientos</h5>
+    <h5 className="mt-4">Ventas sin pagar</h5>
    <table className='table table-striped table-hover  shadow-lg custom-table'>
    <thead className="custom-table-header">
     <tr>
@@ -433,7 +468,7 @@ useEffect(()=>{
         </tbody>
     </table>
     <div className='d-flex justify-content-center mt-5'>
-      <Button onClick={registrarPago}>Generar orden de cobro</Button>
+      <Button onClick={registrarPago}>GENERAR ORDEN DE COBRO</Button>
     </div>
       
     </div>

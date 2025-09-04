@@ -31,7 +31,8 @@ const verElCreditoCompleto = (req, res) => {
             JOIN metodopago mp ON v.Id_metodoPago = mp.Id_metodoPago
             JOIN usuarios u ON v.Id_usuario = u.Id_usuario
             WHERE mp.nombre_metodopago = 'A CREDITO'
-              AND c.Id_cliente = ?`,
+              AND c.Id_cliente = ?
+              AND v.faltaPagar > 0`,
     [Id_cliente],
     (error, results) => {
       if (error) {
