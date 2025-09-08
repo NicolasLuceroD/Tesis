@@ -119,7 +119,6 @@ const obtenerMovimientosCliente = (Id_cliente) => {
   axios.get(`${URL}clientes/verMovimientosClientes/${Id_cliente}/${formattedDate}`).then((response) => {
     console.log('Movimientos de clientes: ', response.data)
     setMovimientos(response.data)
-    setShowModalMovimientos(true)
   }).catch((err) => {
     console.error('Error al traer los movimientos' ,err)
     Swal.fire("Error", "No se pudieron cargar los movimientos", "error");
@@ -223,7 +222,12 @@ const registrarPago = () => {
   });
 };
 
-
+//ABRIR MODAL MOVIMIENTOS
+const abrirModalMovimientos = (Id_cliente) => {
+  setIdCliente(Id_cliente); 
+  setShowModalMovimientos(true);
+  obtenerMovimientosCliente(Id_cliente);
+};
 
 
 //FILTRO POR NOMBRE USUARIO
@@ -254,7 +258,11 @@ useEffect(()=>{
   if (detalleCliente.length > 0 || ordenSeleccionada) {
     scrollToEnd()
   }
-},[detalleCliente,ordenSeleccionada,fechaSeleccionada])
+
+  if(showModalMovimientos && idCliente) {
+    obtenerMovimientosCliente(idCliente)
+  }
+},[detalleCliente,ordenSeleccionada,fechaSeleccionada,showModalMovimientos])
 
 
 
@@ -297,7 +305,7 @@ useEffect(()=>{
                       </Button>
                     </td>
                     <td>
-                      <Button variant='danger' onClick={() => obtenerMovimientosCliente(cli.Id_cliente)}>
+                      <Button variant='danger' onClick={() => abrirModalMovimientos(cli.Id_cliente)}>
                         <FontAwesomeIcon icon={faDollar} />
                       </Button>
                     </td>
