@@ -6,6 +6,8 @@ import { faCheck, faDollar, faEye } from '@fortawesome/free-solid-svg-icons'
 import { formatCurrency } from '../Utils/formatCurrency'
 import { scrollToEnd } from '../Utils/scrollToEnd'
 import { QRCodeCanvas } from "qrcode.react";
+import { PdfPagosClientes } from '../../pdf/PdfPagosClientes'
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import ScrollToTopButton from '../Utils/ScrollToTopButton'
 import jsPDF from 'jspdf';
 import autoTable from "jspdf-autotable";
@@ -14,7 +16,6 @@ import Swal from 'sweetalert2'
 import App from '../../App'
 import Paginacion from '../Common/Paginacion'
 import logo from '../../assets/LogoNobel.jpg';
-import { PdfPagosClientes } from '../../pdf/PdfPagosClientes'
 
 const CreditosClientes = () => {
 
@@ -22,6 +23,7 @@ const CreditosClientes = () => {
 const [clientes, setClientes] = useState([])
 const [detalleCliente, setDetalleCliente] = useState([])
 const [metodospago, setMetodosPago] = useState([])
+const [movimientos, setMovimientos] = useState([])
 const [montoCredito, setMontoCredito] = useState('')
 const [telefono, setTelefono] = useState('')
 const [idCliente, setIdCliente] = useState('')
@@ -35,6 +37,8 @@ const [metodopagoseleccionado, setMetodoPagoSeleccionado] = useState('')
 
 //MODALES
 const [showModalClientes, setShowModalClientes] = useState(false)
+const [showModalMovimientos, setShowModalMovimientos] = useState(false)
+const [showModalProductos, setShowModalProductos] = useState(false)
 
 
 //FILTRO BUSCAR CLIENTE
@@ -51,13 +55,16 @@ const idUsuario = localStorage.getItem('idUsuario')
 const handleShowModalClientes = () => setShowModalClientes(true)
 const handleCloseModalClientes = () => setShowModalClientes(false)
 
+const handleShowModalProductos = () => setShowModalProductos(true)
+const handleCloseModalProductos = () => setShowModalProductos(false)
+
 
 
 
 //TRAER CLIENTES
 const verClientes = () => {
   axios.get(`${URL}clientes/verClientes`).then((response) => {
-    console.log('Clientes: ', response.data)
+    console.log('CLientes obtenidos de mi consulta: ',response.data)
     setClientes(response.data)
     setVer(response.data)
     setTotal(response.data.length)
@@ -102,6 +109,18 @@ const verMetodosDePago = () => {
   })
 }
 
+//TRAER MOVIMIENTOS
+const obtenerMovimientosCliente = (Id_cliente) => {
+  axios.get(`${URL}clientes/verMovimientosClientes/${Id_cliente}`).then((response) => {
+    console.log('Movimientos de clientes: ', response.data)
+    setMovimientos(response.data)
+    setShowModalMovimientos(true)
+  }).catch((err) => {
+    console.error('Error al traer los movimientos' ,err)
+    Swal.fire("Error", "No se pudieron cargar los movimientos", "error");
+  })
+}
+
 
 //REGISTRAR PAGO
 const registrarPago = () => {
@@ -138,7 +157,8 @@ const registrarPago = () => {
       // 2️⃣ Actualizar faltaPagar en ventas
       const nuevoFaltaPagar = ordenSeleccionada.faltaPagar - monto;
 
-      return axios.put(`${URL}venta/actualizarFaltaPagar/${ordenSeleccionada.Id_venta}`, {
+      return axios.put(`${URL}venta/actualizarFaltaPagar/${ordenSeleccionada.Id_venta}`, 
+      {
         faltaPagar: nuevoFaltaPagar
       });
     })
@@ -149,6 +169,17 @@ const registrarPago = () => {
       return axios.put(`${URL}clientes/actualizarCredito/${idCliente}`, {
         monto_credito: nuevoCredito
       });
+    })
+     // 4️⃣ Insertar movimiento en movimientosclientes
+    .then(() => {
+      return axios.post(`${URL}clientes/registrarmovimiento`, 
+        {
+          Id_cliente: idCliente,
+          montoCredito: 0,
+          montoDebito: monto,
+          Saldo: montoCredito - monto,
+          Id_venta: ordenSeleccionada.Id_venta 
+        })
     })
     .then(() => {
       // Mostrar alerta de éxito
@@ -251,7 +282,7 @@ useEffect(()=>{
                       </Button>
                     </td>
                     <td>
-                      <Button variant='danger'>
+                      <Button variant='danger' onClick={() => obtenerMovimientosCliente(cli.Id_cliente)}>
                         <FontAwesomeIcon icon={faDollar} />
                       </Button>
                     </td>
@@ -475,6 +506,70 @@ useEffect(()=>{
   </div>
 )}
 
+{/* MODAL DE MOVIMIENTOS */}
+<Modal show={showModalMovimientos} onHide={() => setShowModalMovimientos(false)} size="xl">
+  <Modal.Header closeButton>
+    <Modal.Title>Movimientos del Cliente</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {movimientos.length > 0 ? (
+      <table className="table table-striped table-hover shadow-lg custom-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>N Venta</th>
+            <th>Crédito</th>
+            <th>Débito</th>
+            <th>Saldo</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+        <tbody>
+          {movimientos.map((mov) => (
+            <tr key={mov.Id_movimientoCliente}>
+              <td>{new Date(mov.fechaRegistro).toLocaleString()}</td>
+              <td>{mov.Id_venta || "-"}</td>
+              <td className="text-success fw-bold">
+                {mov.Credito > 0 ? formatCurrency(mov.Credito) : "-"}
+              </td>
+              <td className="text-danger fw-bold">
+                {mov.Debito > 0 ? formatCurrency(mov.Debito) : "-"}
+              </td>
+              <td className="fw-bold">{formatCurrency(mov.Saldo)}</td>
+             <td>
+                <OverlayTrigger
+                  trigger="click"
+                  placement="right"
+                  rootClose
+                  overlay={
+                    <Popover id={`popover-${mov.Id_movimientoCliente}`}>
+                      <Popover.Header as="h6">Productos de la venta</Popover.Header>
+                      <Popover.Body>
+                        {mov.productos && mov.productos.length > 0 ? (
+                          mov.productos.map((prod, i) => (
+                            <div key={i}>
+                              • {prod.nombre_producto} ({parseInt(prod.cantidadVendida)} {prod.tipoVenta})
+                            </div>
+                          ))
+                        ) : (
+                          <div>No hay productos</div>
+                        )}
+                      </Popover.Body>
+                    </Popover>
+                  }
+                >
+                  <Button variant="success">VER</Button>
+                </OverlayTrigger>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p className="text-center text-muted">No hay movimientos registrados.</p>
+    )}
+  </Modal.Body>
+</Modal>
 <ScrollToTopButton />
     </>
   )

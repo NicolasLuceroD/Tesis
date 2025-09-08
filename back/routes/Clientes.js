@@ -1,6 +1,6 @@
 const {Router}=require('express')
 const router = Router()
-const {verClientes,crearClientes,editarClientes,eliminarCliente, aumentarCredito,actualizarCredito}= require('../controllers/Clientes.js')
+const {verClientes,crearClientes,editarClientes,eliminarCliente, aumentarCredito,actualizarCredito, registrarmovimiento,verMovimientosClientes}= require('../controllers/Clientes.js')
 
 
 //CRUD
@@ -11,7 +11,9 @@ router.put('/delete/:Id_cliente', eliminarCliente)
 
 
 //PARA CREDITOS
+router.get('/verMovimientosClientes/:Id_cliente',verMovimientosClientes)
 router.put('/aumentarCredito', aumentarCredito)
 router.put('/actualizarCredito/:id',actualizarCredito)
+router.post('/registrarmovimiento',registrarmovimiento)
 
 module.exports = router

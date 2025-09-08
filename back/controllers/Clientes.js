@@ -52,6 +52,8 @@ const eliminarCliente = (req,res) => {
         })
 }
 
+//PARA CREDITOS
+
 const aumentarCredito = (req,res) => {
     console.log('Body recibido:', req.body);
     const Id_cliente = req.body.Id_cliente
@@ -73,5 +75,74 @@ const actualizarCredito = (req,res) => {
     })
 }
 
+const registrarmovimiento = (req,res) => {
+    connection.query('INSERT INTO movimientosclientes SET ?', 
+        {
+            Id_cliente: req.body.Id_cliente,
+            montoCredito: req.body.montoCredito,
+            montoDebito: req.body.montoDebito,
+            Saldo: req.body.Saldo,
+            Id_venta: req.body.Id_venta
+        },(error,results) => {
+            if (error) throw error
+            res.json(results)
+        })
+}
 
-module.exports={verClientes,crearClientes,editarClientes,eliminarCliente,aumentarCredito,actualizarCredito}
+const verMovimientosClientes = (req, res) => {
+  const Id_cliente = req.params.Id_cliente;
+  
+  const query = `
+    SELECT 
+      mc.Id_movimientoCliente,
+      mc.Id_cliente,
+      mc.montoCredito AS Credito,
+      mc.montoDebito AS Debito,
+      mc.Saldo,
+      mc.fechaRegistro,
+      mc.Id_venta,
+      p.nombre_producto,
+      dv.cantidadVendida,
+      dv.tipoVenta
+    FROM movimientosclientes mc
+    LEFT JOIN detalleventa dv ON dv.Id_venta = mc.Id_venta
+    LEFT JOIN productos p ON p.Id_producto = dv.Id_producto
+    WHERE mc.Id_cliente = ?
+    ORDER BY mc.fechaRegistro ASC;
+  `;
+
+  connection.query(query, [Id_cliente], (error, results) => {
+    if (error) throw error;
+
+    // Agrupar productos por movimiento
+    const movimientosMap = {};
+    results.forEach(row => {
+      if (!movimientosMap[row.Id_movimientoCliente]) {
+        movimientosMap[row.Id_movimientoCliente] = {
+          Id_movimientoCliente: row.Id_movimientoCliente,
+          Id_cliente: row.Id_cliente,
+          Credito: row.Credito,
+          Debito: row.Debito,
+          Saldo: row.Saldo,
+          fechaRegistro: row.fechaRegistro,
+          Id_venta: row.Id_venta,
+          productos: []
+        };
+      }
+      if (row.nombre_producto) {
+        movimientosMap[row.Id_movimientoCliente].productos.push({
+          nombre_producto: row.nombre_producto,
+          cantidadVendida: row.cantidadVendida,
+          tipoVenta: row.tipoVenta
+        });
+      }
+    });
+
+    // Convertir de objeto a array
+    const movimientos = Object.values(movimientosMap);
+    res.json(movimientos);
+  });
+};
+
+
+module.exports={verClientes,crearClientes,editarClientes,eliminarCliente,aumentarCredito,actualizarCredito,registrarmovimiento,verMovimientosClientes}
