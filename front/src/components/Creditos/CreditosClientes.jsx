@@ -15,6 +15,8 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import App from '../../App'
 import Paginacion from '../Common/Paginacion'
+import DatePicker from 'react-datepicker';
+import es from 'date-fns/locale/es';
 import logo from '../../assets/LogoNobel.jpg';
 
 const CreditosClientes = () => {
@@ -33,6 +35,8 @@ const [clienteEncontrado, setClienteEncontrado] = useState(0)
 const [monto, setMonto] = useState('')
 const [ordenSeleccionada, setOrdenSeleccionada] = useState(null)
 const [metodopagoseleccionado, setMetodoPagoSeleccionado] = useState('')
+const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
+
 
 
 //MODALES
@@ -111,7 +115,8 @@ const verMetodosDePago = () => {
 
 //TRAER MOVIMIENTOS
 const obtenerMovimientosCliente = (Id_cliente) => {
-  axios.get(`${URL}clientes/verMovimientosClientes/${Id_cliente}`).then((response) => {
+  const formattedDate = formatDate(fechaSeleccionada)
+  axios.get(`${URL}clientes/verMovimientosClientes/${Id_cliente}/${formattedDate}`).then((response) => {
     console.log('Movimientos de clientes: ', response.data)
     setMovimientos(response.data)
     setShowModalMovimientos(true)
@@ -121,6 +126,16 @@ const obtenerMovimientosCliente = (Id_cliente) => {
   })
 }
 
+//FORMATO DE FECHA
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+//ULTIMO DIA DEL MES
+const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
 
 //REGISTRAR PAGO
 const registrarPago = () => {
@@ -239,7 +254,7 @@ useEffect(()=>{
   if (detalleCliente.length > 0 || ordenSeleccionada) {
     scrollToEnd()
   }
-},[detalleCliente,ordenSeleccionada])
+},[detalleCliente,ordenSeleccionada,fechaSeleccionada])
 
 
 
@@ -512,6 +527,18 @@ useEffect(()=>{
     <Modal.Title>Movimientos del Cliente</Modal.Title>
   </Modal.Header>
   <Modal.Body>
+      <DatePicker
+        selected={fechaSeleccionada}
+        onChange={(date) => {
+            setFechaSeleccionada(date)
+        }}
+        className='form-control custom-date-picker custom-datepicker-wrapper'
+        dateFormat="yyyy/MM/d"
+        locale={es}
+        placeholderText='Ingrese una fecha'
+        maxDate={lastDayOfMonth
+        }
+    />
     {movimientos.length > 0 ? (
       <table className="table table-striped table-hover shadow-lg custom-table">
         <thead>

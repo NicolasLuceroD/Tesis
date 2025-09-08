@@ -11,7 +11,7 @@ router.put('/delete/:Id_cliente', eliminarCliente)
 
 
 //PARA CREDITOS
-router.get('/verMovimientosClientes/:Id_cliente',verMovimientosClientes)
+router.get('/verMovimientosClientes/:Id_cliente/:fechaSeleccionada', verMovimientosClientes);
 router.put('/aumentarCredito', aumentarCredito)
 router.put('/actualizarCredito/:id',actualizarCredito)
 router.post('/registrarmovimiento',registrarmovimiento)

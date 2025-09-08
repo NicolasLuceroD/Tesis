@@ -91,9 +91,10 @@ const registrarmovimiento = (req,res) => {
 
 const verMovimientosClientes = (req, res) => {
   const Id_cliente = req.params.Id_cliente;
-  
+  const fechaSeleccionada = req.params.fechaSeleccionada;
+
   const query = `
-    SELECT 
+   SELECT 
       mc.Id_movimientoCliente,
       mc.Id_cliente,
       mc.montoCredito AS Credito,
@@ -108,10 +109,11 @@ const verMovimientosClientes = (req, res) => {
     LEFT JOIN detalleventa dv ON dv.Id_venta = mc.Id_venta
     LEFT JOIN productos p ON p.Id_producto = dv.Id_producto
     WHERE mc.Id_cliente = ?
+    AND DATE(mc.fechaRegistro) = ?
     ORDER BY mc.fechaRegistro ASC;
   `;
 
-  connection.query(query, [Id_cliente], (error, results) => {
+  connection.query(query, [Id_cliente,fechaSeleccionada], (error, results) => {
     if (error) throw error;
 
     // Agrupar productos por movimiento
