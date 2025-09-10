@@ -35,42 +35,80 @@ const seeUsuarios = () => {
 
 //COMPROBAR LOGIN
 const comprobarLogin = () => {
-    console.log('Nombre de usuario:', usuarioSeleccionado)
-    console.log('Clave:', clave)
+  console.log('Nombre de usuario:', usuarioSeleccionado)
+  console.log('Clave:', clave)
 
-    axios.post(`${URL}login/post`, {
-      nombre_usuario : usuarioSeleccionado,
-      clave : clave      
-    })
-    .then(response => {
-        console.log(response.data)
-        if (response.data.success) {
-          // Guardamos el token en el localStorage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('nombreUsuario', usuarioSeleccionado);
-          localStorage.setItem('idUsuario', response.data.usuario.id);
-          console.log("Token guardado:", response.data.token);
-          
-          // Decodificar el token para obtener la fecha de expiración
-          const decodedToken = jwt_decode(response.data.token);
-          const expirationDate = decodedToken.exp * 1000; // Convertimos la expiración a milisegundos
-          localStorage.setItem('tokenExpiration', expirationDate); // Guardamos la expiración
+  axios.post(`${URL}login/post`, {
+    nombre_usuario : usuarioSeleccionado,
+    clave : clave      
+  })
+  .then(response => {
+    console.log(response.data)
+    if (response.data.success) {
+      // Guardamos el token en el localStorage
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('nombreUsuario', usuarioSeleccionado);
+      localStorage.setItem('idUsuario', response.data.usuario.id);
 
-          // Redirigir después de que se cierra la alerta
-          navigate('/venta');
-        
-          // Mostrar alerta de bienvenida
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: `¡Bienvenido, ${usuarioSeleccionado}!`,
-            background: '#e0ffe0',     
-            color: '#205522',        
-            timer: 2500,
-            timerProgressBar: true,
-            showConfirmButton: false,
+      // Decodificar token para expiración
+      const decodedToken = jwt_decode(response.data.token);
+      const expirationDate = decodedToken.exp * 1000; 
+      localStorage.setItem('tokenExpiration', expirationDate); 
+
+      // 👉 Mostrar modal para ingresar fondo de caja
+      Swal.fire({
+        title: 'Fondo inicial de caja',
+        input: 'number',
+        inputLabel: 'Ingrese el dinero inicial en caja',
+        inputAttributes: {
+          min: 0,
+          step: 0.01
+        },
+        confirmButtonText: 'Aceptar',
+        allowOutsideClick: false,
+        allowEscapeKey: true,
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value || value < 0) {
+            return 'Debes ingresar un monto válido';
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const montoInicial = parseFloat(result.value);
+
+          // Guardar monto inicial en la base de datos
+          axios.post(`${URL}caja/apertura`, {
+            id_usuario: response.data.usuario.id,
+            monto_inicial: montoInicial
+          })
+          .then(() => {
+            Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'success',
+              title: `¡Bienvenido, ${usuarioSeleccionado}!`,
+              background: '#e0ffe0',     
+              color: '#205522',        
+              timer: 2500,
+              timerProgressBar: true,
+              showConfirmButton: false,
             });
+
+            // Redirigir después de abrir caja
+            navigate('/venta');
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al abrir la caja',
+              text: 'No se pudo registrar la apertura de caja. Intente de nuevo.'
+            });
+          });
+        }
+      });
+
     } else {
       Swal.fire({
         icon: 'error',
@@ -86,7 +124,7 @@ const comprobarLogin = () => {
       title: 'Error al iniciar sesión',
       text: 'Ocurrió un problema al intentar iniciar sesión. Inténtalo de nuevo más tarde.',
     });
-  })
+  });
 }
 
 useEffect(()=> {
