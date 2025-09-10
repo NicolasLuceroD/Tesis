@@ -26,7 +26,7 @@ const cerrarTurno = async () => {
     const idUsuario = localStorage.getItem('idUsuario');
 
     // 1️⃣ Traer total teórico de la caja
-    const response = await axios.get(`${URL}caja/totalVentasDia/${idUsuario}`);
+    const response = await axios.get(`${URL}caja/totalVentasDia/${idUsuario}/${idApertura}`);
     const totalEsperado = response.data.total_esperado;
 
     // 2️⃣ Mostrar Swal con total teórico e input para monto real

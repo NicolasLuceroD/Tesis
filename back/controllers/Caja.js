@@ -37,26 +37,35 @@ const registrarCierreCaja = (req,res)  => {
 
 const totalVentasDia = (req, res) => {
     const idUsuario = req.params.idUsuario;
-    connection.query( `SELECT
-                                IFNULL((SELECT SUM(precioTotal_Venta)
-                                        FROM venta
-                                        WHERE DATE(fecha_registro) = CURDATE()
-                                        AND Id_usuario = ?
-                                        AND Id_metodoPago != 5), 0)
-                            +
-                                IFNULL((SELECT SUM(monto)
-                                        FROM pagosclientes
-                                        WHERE DATE(fecha_pago) = CURDATE()), 0)
-                            +
-                                IFNULL((SELECT monto_inicial
-                                        FROM aperturas_caja
-                                        WHERE Id_usuario = ?
-                                        AND DATE(fecha_apertura) = CURDATE()), 0) AS total_esperado`, [idUsuario,idUsuario], (error, results) => {
-                        if (error) {
-                            console.error(error);
-                            return res.status(500).json({ error: 'Error al calcular total esperado' });
-                        }
-                        res.json({ total_esperado: results[0].total_esperado });
+    const idApertura = req.params.idApertura; 
+
+    connection.query(`
+        SELECT
+            IFNULL(
+                (SELECT SUM(precioTotal_Venta)
+                 FROM venta
+                 WHERE Id_usuario = ?
+                   AND Id_metodoPago != 5
+                   AND fecha_registro >= (SELECT fecha_apertura 
+                                          FROM aperturas_caja 
+                                          WHERE Id_apertura = ?)), 0)
+        +
+            IFNULL(
+                (SELECT SUM(monto)
+                 FROM pagosclientes
+                 WHERE fecha_pago >= (SELECT fecha_apertura 
+                                      FROM aperturas_caja 
+                                      WHERE Id_apertura = ?)), 0)
+        +
+            IFNULL(
+                (SELECT monto_inicial
+                 FROM aperturas_caja
+                 WHERE Id_apertura = ?), 0) AS total_esperado`, [idUsuario, idApertura, idApertura, idApertura], (error, results) => {
+        if (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error al calcular total esperado' });
+        }
+        res.json({ total_esperado: results[0].total_esperado });
     });
 };
 
