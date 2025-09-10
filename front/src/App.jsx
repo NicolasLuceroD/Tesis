@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect,useContext } from 'react';
 import { Button, NavDropdown } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -8,16 +8,77 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCreditCard, faDoorOpen, faFileAlt, faShoppingCart, faUsers, faBoxOpen, faTags, faUser, faClinicMedical, faTools, faChartPie, faCashRegister, faHandshake } from '@fortawesome/free-solid-svg-icons';
+import { DataContext } from '../src/context/DataContext'
+import axios from 'axios';
+import { formatCurrency } from '../src/components/Utils/formatCurrency'
 
 function App() {
 
+//URL
+const { URL } = useContext(DataContext)
   // Cerrar sesión
-  const cerrarTurno = () => {
-    localStorage.removeItem('nombreUsuario');
-    localStorage.removeItem('token');
-    localStorage.removeItem('tokenExpiration');
-    navigate('/');
-  };
+const cerrarTurno = async () => {
+  try {
+    const idUsuario = localStorage.getItem('idUsuario');
+
+    // 1️⃣ Traer total teórico de la caja
+    const response = await axios.get(`${URL}caja/totalVentasDia/${idUsuario}`);
+    const totalEsperado = response.data.total_esperado;
+
+    // 2️⃣ Mostrar Swal con total teórico e input para monto real
+    Swal.fire({
+      title: 'Cierre de Turno',
+      html: `<p>Total esperado en caja: <b>${formatCurrency(totalEsperado)}</b></p>`,
+      input: 'number',
+      inputLabel: 'Ingrese el monto contado en caja',
+      inputAttributes: {
+        min: 0,
+        step: 0.01
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Registrar cierre',
+      allowOutsideClick: false,
+      inputValidator: (value) => {
+        if (!value || value < 0) {
+          return 'Debes ingresar un monto válido';
+        }
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const montoReal = parseFloat(result.value);
+
+        // 3️⃣ Enviar cierre de caja al backend
+        await axios.post(`${URL}caja/cerrarTurno`, {
+          id_usuario: idUsuario,
+          monto_teorico: totalEsperado,
+          monto_real: montoReal
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Turno cerrado',
+          text: `Cierre registrado correctamente.`,
+          timer: 2500,
+          showConfirmButton: false
+        });
+
+        // Limpiar sesión y redirigir
+        localStorage.removeItem('nombreUsuario');
+        localStorage.removeItem('token');
+        localStorage.removeItem('tokenExpiration');
+        navigate('/');
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo cerrar el turno. Intente nuevamente.'
+    });
+  }
+};
 
 
 
