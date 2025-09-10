@@ -78,7 +78,7 @@ const comprobarLogin = () => {
           const montoInicial = parseFloat(result.value);
 
           // Guardar monto inicial en la base de datos
-          axios.post(`${URL}caja/apertura`, {
+          axios.post(`${URL}caja/registrarAperturaCaja`, {
             id_usuario: response.data.usuario.id,
             monto_inicial: montoInicial
           })
