@@ -16,7 +16,11 @@ function App() {
 
 //URL
 const { URL } = useContext(DataContext)
-  // Cerrar sesión
+
+//OBTENER APERTURA POR LOCAL STORAGE
+const idApertura = localStorage.getItem('idApertura')
+
+//CERRAR TURNO
 const cerrarTurno = async () => {
   try {
     const idUsuario = localStorage.getItem('idUsuario');
@@ -46,12 +50,15 @@ const cerrarTurno = async () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const montoReal = parseFloat(result.value);
+        const diferencia = totalEsperado - montoReal
 
         // 3️⃣ Enviar cierre de caja al backend
-        await axios.post(`${URL}caja/cerrarTurno`, {
-          id_usuario: idUsuario,
-          monto_teorico: totalEsperado,
-          monto_real: montoReal
+        await axios.post(`${URL}caja/registrarCierreCaja`, {
+          Id_apertura: idApertura,
+          monto_ventas: totalEsperado,
+          monto_esperado: totalEsperado,
+          monto_real: montoReal,
+          diferencia: diferencia
         });
 
         Swal.fire({
@@ -66,6 +73,8 @@ const cerrarTurno = async () => {
         localStorage.removeItem('nombreUsuario');
         localStorage.removeItem('token');
         localStorage.removeItem('tokenExpiration');
+        localStorage.removeItem('idApertura');
+        localStorage.removeItem('idUsuario');
         navigate('/');
       }
     });

@@ -82,7 +82,8 @@ const comprobarLogin = () => {
             id_usuario: response.data.usuario.id,
             monto_inicial: montoInicial
           })
-          .then(() => {
+          .then((res) => {
+            localStorage.setItem('idApertura',res.data.Id_apertura)
             Swal.fire({
               toast: true,
               position: 'top-end',

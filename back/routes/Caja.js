@@ -1,9 +1,10 @@
 const {Router}=require('express')
 const router = Router()
 
-const {registrarAperturaCaja,totalVentasDia} = require('../controllers/Caja')
+const {registrarAperturaCaja,totalVentasDia,registrarCierreCaja} = require('../controllers/Caja')
 
-router.post('/registrarAperturaCaja',registrarAperturaCaja)
 router.get('/totalVentasDia/:idUsuario',totalVentasDia)
+router.post('/registrarAperturaCaja',registrarAperturaCaja)
+router.post('/registrarCierreCaja',registrarCierreCaja)
 
 module.exports = router

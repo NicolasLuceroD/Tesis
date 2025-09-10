@@ -15,6 +15,26 @@ const registrarAperturaCaja  = (req,res) => {
         })
 }
 
+const registrarCierreCaja = (req,res)  => {
+
+    const { Id_apertura, monto_esperado, monto_ventas, monto_real, diferencia } = req.body;
+    connection.query('INSERT INTO cierres_caja SET ?',
+        {
+            Id_apertura: Id_apertura,
+            monto_ventas,
+            monto_esperado: monto_esperado,
+            monto_real: monto_real,
+            diferencia
+        },(error,results) => {
+            if(error)  {
+                console.error(error)
+                return res.status(500).json({ error: 'Error al registrar el cierre de turno' });
+            }
+            res.json({ message: 'Cierre de turno registrado con éxito', Id_cierre: results.insertId })
+        }
+    )
+}
+
 const totalVentasDia = (req, res) => {
     const idUsuario = req.params.idUsuario;
     connection.query( `SELECT
@@ -40,4 +60,4 @@ const totalVentasDia = (req, res) => {
     });
 };
 
-module.exports = {registrarAperturaCaja,totalVentasDia}
+module.exports = {registrarAperturaCaja,totalVentasDia,registrarCierreCaja}
