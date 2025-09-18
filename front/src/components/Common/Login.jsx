@@ -69,7 +69,7 @@ const comprobarLogin = () => {
         allowEscapeKey: true,
         showCancelButton: true,
         inputValidator: (value) => {
-          if (!value || value < 0) {
+          if (!value || value <= 0) {
             return 'Debes ingresar un monto válido';
           }
         }

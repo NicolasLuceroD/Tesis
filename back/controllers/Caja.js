@@ -16,7 +16,7 @@ const registrarAperturaCaja  = (req,res) => {
 }
 
 const registrarCierreCaja = (req,res)  => {
-
+    
     const { Id_apertura, monto_esperado, monto_ventas, monto_real, diferencia } = req.body;
     connection.query('INSERT INTO cierres_caja SET ?',
         {
@@ -39,6 +39,10 @@ const totalVentasDia = (req, res) => {
     const idUsuario = req.params.idUsuario;
     const idApertura = req.params.idApertura; 
 
+    //1) - Ventas del usuario: Suma todo lo que vendió ese usuario, siempre que no haya usado el metodo de pago con Id 5 (a credito),solo cuenta las ventas hechas desde la fecha de apertura de caja indicada
+    //2) - Pagos de clientes: Suma todos los pagos de clientes, solo los que se hicieron desde la apertura de caja,
+    //3) - Monto inicial de la caja: Toma el monto con el que se abrió la caja,
+    //Resultado esperado: ventas + pagosclientes + monto_inicial
     connection.query(`
         SELECT
             IFNULL(
