@@ -564,10 +564,14 @@ useEffect(()=>{
                             </ul>
                           </td>
 
-                          <td>
-                            <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
-                              +
-                            </Button>
+                         <td>
+                            {loteCercano ? (
+                              <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
+                                +
+                              </Button>
+                            ) : (
+                              <small style={{ color: "red" }}>❌ No hay lotes válidos</small>
+                            )}
                           </td>
                         </tr>
                       );
