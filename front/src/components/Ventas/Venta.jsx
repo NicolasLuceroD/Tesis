@@ -389,7 +389,7 @@ const buscarProductos = async (texto) => {
     setProductos([]);
     setTotal(0);
     return;
-}
+} 
 
   // Hacemos la solicitud al backend
   const respuesta = await axios.get(`${URL}productos/buscar/${texto}`);
@@ -483,77 +483,92 @@ useEffect(()=>{
                     </tr>
                   </thead>
                   <tbody>
-                      {productos.map((prod) => {
-                      /* Aca filtro los lotes que no esten vencidos*/
+                     {productos.map((prod) => {
+                      // Filtramos los lotes que no estén vencidos
                       const lotesValidos = prod.lotes.filter(l => {
                         const diasRestantes = Math.ceil((new Date(l.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
-                        return diasRestantes >= 0; // solo lotes no vencidos
+                        return diasRestantes >= 0;
                       });
 
-                       // Tomamos el lote más cercano a vencer
-                      const loteCercano = lotesValidos.reduce((prev, curr) =>
-                        new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
-                      );
-                      const diasRestantes = Math.ceil((new Date(loteCercano.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24));
-                      const estaPorVencer = diasRestantes <= 5;
+                      // Lote más cercano a vencer, o null si no hay lotes válidos
+                      const loteCercano = lotesValidos.length > 0
+                        ? lotesValidos.reduce((prev, curr) =>
+                            new Date(prev.fecha_vencimiento) < new Date(curr.fecha_vencimiento) ? prev : curr
+                          )
+                        : null;
+
+                      const diasRestantes = loteCercano
+                        ? Math.ceil((new Date(loteCercano.fecha_vencimiento) - new Date()) / (1000 * 60 * 60 * 24))
+                        : null;
+
+                      const estaPorVencer = diasRestantes !== null && diasRestantes <= 5;
 
                       return (
                         <tr key={prod.Id_producto} className={estaPorVencer ? "table-warning" : ""}>
+                         <td>
+                              <strong>{prod.nombre_producto}</strong><br />
+                              <small>Código: {prod.codigobarras_producto}</small><br />
+
+                              {loteCercano ? (
+                                <>
+                                  <strong><small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small></strong><br />
+                                  <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
+                                  <small>Lote: {loteCercano.nro_lote}</small><br />
+
+                                  {prod.lotes.some(l => new Date(l.fecha_vencimiento) > new Date(loteCercano.fecha_vencimiento)) && (
+                                    <small style={{ color: "green", fontWeight: "bold" }}>
+                                      📦 Hay más stock en otro lote, no te preocupes!
+                                    </small>
+                                  )}
+
+                                  {/* Nuevo cálculo solo con lotes válidos */}
+                                  {lotesValidos.length === 1 && (
+                                    <small style={{ color: "red", fontWeight: "bold" }}>
+                                      ⚠️ Este es el único lote con stock. ¡Debes comprar!
+                                    </small>
+                                  )}
+
+                                  {estaPorVencer && (
+                                    <div>
+                                      <small style={{ color: "red" }}>
+                                        ⚠ Lote vence en {diasRestantes} días!
+                                      </small>
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <small style={{ color: "red" }}>⚠️ Todos los lotes están vencidos</small>
+                              )}
+                            </td>
+
                           <td>
-                            <strong>{prod.nombre_producto}</strong><br />
-                            <small>Código: {prod.codigobarras_producto}</small><br />
-                            <strong><small>Vto: {new Date(loteCercano.fecha_vencimiento).toLocaleDateString()}</small></strong><br />
-                            <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
-                            <small>Lote: {loteCercano.nro_lote}</small><br />
-
-                            {prod.lotes.some(l => new Date(l.fecha_vencimiento) > new Date(loteCercano.fecha_vencimiento)) && (
-                              <small style={{ color: "green", fontWeight: "bold" }}>
-                                📦 Hay más stock en otro lote, no te preocupes!
-                              </small>
-                            )}
-
-                            {!prod.lotes.some(l => l.Id_lote !== loteCercano.Id_lote && l.cantidad_disponible > 0) && (
-                              <small style={{ color: "red", fontWeight: "bold" }}>
-                                ⚠️ Este es el único lote con stock. ¡Debes comprar!
-                              </small>
-                            )}
-
-                            {estaPorVencer && (
-                              <div>
-                                <small style={{ color: "red" }}>
-                                  ⚠ Lote vence en {diasRestantes} días!
-                                </small>
-                              </div>
-                            )}
+                            <ul style={{ paddingLeft: "15px", margin: 0, listStyle: "none" }}>
+                              {prod.precio_unitario && (
+                                <li style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <small>Unidad:</small>
+                                  <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_unitario)}</strong></small>
+                                </li>
+                              )}
+                              {prod.precio_tira && (
+                                <li style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <small>Tira:</small>
+                                  <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_tira)}</strong></small>
+                                </li>
+                              )}
+                              {prod.precio_caja && (
+                                <li style={{ display: "flex", justifyContent: "space-between" }}>
+                                  <small>Caja:</small>
+                                  <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_caja)}</strong></small>
+                                </li>
+                              )}
+                            </ul>
                           </td>
-                          <td>
-                              <ul style={{ paddingLeft: "15px", margin: 0, listStyle: "none" }}>
-                                {prod.precio_unitario && (
-                                  <li style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <small>Unidad:</small>
-                                    <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_unitario)}</strong></small>
-                                  </li>
-                                )}
-                                {prod.precio_tira && (
-                                  <li style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <small>Tira:</small>
-                                    <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_tira)}</strong></small>
-                                  </li>
-                                )}
-                                {prod.precio_caja && (
-                                  <li style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <small>Caja:</small>
-                                    <small style={{ marginLeft: '5px' }}><strong>{formatCurrency(prod.precio_caja)}</strong></small>
-                                  </li>
-                                )}
-                              </ul>
-                            </td>
 
-                            <td>
-                                  <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
-                                    +
-                                  </Button>
-                            </td>
+                          <td>
+                            <Button size="md" variant="outline-success" onClick={() => agregarAlCarrito(prod)}>
+                              +
+                            </Button>
+                          </td>
                         </tr>
                       );
                     })}
