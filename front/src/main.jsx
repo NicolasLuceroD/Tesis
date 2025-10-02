@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes} from 'react-router-dom'
 
 //IMPORTO MIS RUTAS
-import { categoria, app, clientes, metodopago, usuarios, venta, productos, droguerias,compra, detallecompra, stock, reportes, creditosc, creditosp, detalleventa} from './routes/routes.js'
+import { categoria, app, clientes, metodopago, usuarios, venta, productos, droguerias,compra, detallecompra, stock, reportes, creditosc, detalleventa, reporteventa} from './routes/routes.js'
 
 //IMPORTO SUS COMPONENTES
 import Categoria from './components/CRUDS/Categoria.jsx'
@@ -23,7 +23,8 @@ import DetalleCompra from './components/Compras/DetalleCompra.jsx'
 import Stock from './components/Stock.jsx'
 import Reportes from './components/Reportes.jsx'
 import CreditosClientes from './components/Creditos/CreditosClientes.jsx'
-import CreditosProveedores from './components/Creditos/CreditosProveedores.jsx'
+import ReporteVenta from './components/Auditorias/ReporteVenta.jsx'
+
 
 
 
@@ -46,9 +47,8 @@ createRoot(document.getElementById('root')).render(
           <Route path={detallecompra} element={<DetalleCompra/>}/>
           <Route path={stock} element={<Stock/>}/>
           <Route path={reportes} element={<Reportes/>}/>
-          <Route path={creditosp} element={<CreditosProveedores/>}/>
           <Route path={creditosc} element={<CreditosClientes/>}/>
-                  
+          <Route path={reporteventa} element={<ReporteVenta/>}/>
         </Routes>
       </BrowserRouter>
     </DataProvider>

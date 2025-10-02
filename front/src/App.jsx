@@ -170,9 +170,6 @@ const cerrarTurno = async () => {
         <NavDropdown.Item as={Link} to="/creditosc">
           <FontAwesomeIcon icon={faUsers} className="me-2" /> CLIENTES
         </NavDropdown.Item>
-        <NavDropdown.Item as={Link} to="/creditosp">
-          <FontAwesomeIcon icon={faHandshake} className="me-2" /> DROGUERIAS
-        </NavDropdown.Item>
       </NavDropdown>
 
     {/* DROPDOWN DE CRUDS */}
@@ -199,6 +196,7 @@ const cerrarTurno = async () => {
 
     {/* DROPDOWN DE REPORTES */}
       <NavDropdown title={<><FontAwesomeIcon icon={faChartPie} className='me-2' />AUDITORIAS</>} id="nav-dropdown-reportes">
+        <NavDropdown.Item as={Link} to="/reporteventa">REPORTE VENTAS</NavDropdown.Item>
         <NavDropdown.Item as={Link} to="/reportes">REPORTE COMPRA</NavDropdown.Item>
       </NavDropdown>
     </Nav>

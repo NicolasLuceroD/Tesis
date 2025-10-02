@@ -12,6 +12,7 @@ export const detallecompra = '/detallecompra'
 
 //REPORTES
 export const reportes = '/reportes'
+export const reporteventa = '/reporteventa'
 
 //STOCK
 export const stock = '/stock'
