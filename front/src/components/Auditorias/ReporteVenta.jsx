@@ -14,22 +14,23 @@ import {
   Legend,
   Bar,
   LabelList,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import axios from 'axios'
 import { format } from 'date-fns'
 
 
-const Reportes = () => {
+const ReporteVenta = () => {
 
 //URL
 const { URL } = useContext(DataContext)
 
 //ESTADOS ARRAY
-const [totalDrogueria, setTotalDrogueria] = useState([])
-const [montototalComprado, setMontoTotalComprado] = useState([])
-const [productosmascomprados, setProductosMasComprados] = useState([])
-const [promediogasto, setPromedioGasto] = useState([])
-
+const [totalvendido,setTotalVendido] = useState([])
+const [totalvendidoclientes, setTotalVendidoClientes] = useState([])
+const [totalvendidometodos, setTotalVendidoMetodos] = useState([])
 
 //ESTADO PARA CALENDARIO
 const [fechaInicio, setFechaInicio] = useState(null);
@@ -40,39 +41,38 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
 
 
 //TRAER TOTAL COMPRADO POR CADA DROGUERIA
-  const verTotalDrogueria = () => {
+  const verTotalVendido = () => {
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd');
       const fin = format(fechaFin, 'yyyy-MM-dd');
-      axios.get(`${URL}reportes/verTotalDrogueria`,{
+      axios.get(`${URL}reporteventa/verTotalVendido`,{
         params: 
         {
           fechaInicio: inicio,
           fechaFin: fin
         }
       }).then((response) => {
-          setTotalDrogueria(response.data)
-          console.log("Total drogueria: ", response.data)
+          setTotalVendido(response.data[0].total_vendido)
       }).catch((error=> {
-        console.error('Error al traer Total drogueria', error)
+        console.error('Error al traer total vendido', error)
       }))
     }
   }
 
 //TRAER LA SUMATORIA GASTADA
-  const verTotalGastado = () => {
+  const verTotalVendidoClientes = () => {
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd');
       const fin = format(fechaFin, 'yyyy-MM-dd');
-      axios.get(`${URL}reportes/verMontoTotalComprado`,{
+      axios.get(`${URL}reporteventa/verTotalVendidoClientes`,{
         params: 
         {
           fechaInicio: inicio,
           fechaFin: fin
         }
       }).then((response) => {
-          setMontoTotalComprado(response.data[0].total_comprado)
-          console.log("Total comprado: ", response.data)
+          setTotalVendidoClientes(response.data)
+          console.log('Total vendido  a clientes: ',response.data)
       }).catch((error=> {
         console.error('Error al traer Total comprado', error)
       }))
@@ -80,39 +80,23 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
   }
 
   //TRAER PRODUCTOS MAS COMPRADOS
-  const verProductosMasComprados = () => {
+  const verTotalVendidoMetodos = () => {
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd')
       const fin = format(fechaFin, 'yyyy-MM-dd')
-      axios.get(`${URL}reportes/verTopProductosComprados`,{
+      axios.get(`${URL}reporteventa/verTotalVendidoMetodos`,{
         params: 
         {
           fechaInicio: inicio,
           fechaFin: fin
         }
       }).then((response) => {
-        setProductosMasComprados(response.data)
-        console.log("Productos mas comprados: ", response.data)
+        setTotalVendidoMetodos(response.data)
+        console.log('Total vendido mp: ',response.data)
       })
     }
   }
 
-  //TRAER PROMEDIO DE GASTO POR COMPRA
-  const verPromedioGastoPorCompra = () => {
-    if (fechaInicio && fechaFin) {
-      const inicio = format(fechaInicio, 'yyyy-MM-dd')
-      const fin = format(fechaFin, 'yyyy-MM-dd')
-      axios.get(`${URL}reportes/verPromedioGasto`, {
-        params: 
-        {
-          fechaInicio: inicio,
-          fechaFin: fin
-        }
-      }).then((response)=> {
-        setPromedioGasto(response.data[0].promedio_gasto)
-      })
-    }
-  }
 
 
 
@@ -125,12 +109,21 @@ const formatCurrency = (value) => {
 };
 
 
+const Colors = [
+  "#ff5e5e", // rojo coral (base)
+  "#ff8c42", // naranja cálido
+  "#ff3d71", // fucsia intenso
+  "#ffb84d", // dorado suave
+  "#e63e3e"  // rojo oscuro
+];
+
+
+
 
 useEffect(()=>{
-  verTotalDrogueria()
-  verTotalGastado()
-  verProductosMasComprados()
-  verPromedioGastoPorCompra()
+  verTotalVendido()
+  verTotalVendidoClientes()
+  verTotalVendidoMetodos()
 },[fechaInicio, fechaFin])
 
 
@@ -167,31 +160,31 @@ useEffect(()=>{
 </div>
 
 <div style={{marginLeft: '15px'}}>
-  <p>MONTO TOTAL VENDIDO A LA FECHA: <strong>{formatCurrency(montototalComprado)}</strong></p>
+  <p>MONTO TOTAL VENDIDO A LA FECHA: <strong>{formatCurrency(totalvendido)}</strong></p>
 </div>
 
 <div style={{ flex: '0 0 48%', marginBottom: '20px' }}>
-    <h5 style={{textAlign: 'center'}}>TOTAL COMPRADO A DROGUERIAS</h5>
-    {totalDrogueria.length === 0 ?(
+    <h5 style={{textAlign: 'center'}}>TOTAL VENDIDO A CLIENTES</h5>
+    {totalvendidoclientes.length === 0 ?(
       <DataReportes/>
     ) : (
       <ResponsiveContainer width="95%" height={500}>
-              <BarChart data={totalDrogueria} layout="vertical">
+              <BarChart data={totalvendidoclientes} layout="vertical">
                 <CartesianGrid strokeDasharray="8 8" />
                 <XAxis
                   type="number"
-                  domain={[0, totalDrogueria.length > 0 ? Math.max(...totalDrogueria.map(item => item.total_comprado)) * 1.5 : 1000]}
+                  domain={[0, totalvendidoclientes.length > 0 ? Math.max(...totalvendidoclientes.map(item => item.total_vendido)) * 1.5 : 1000]}
                   tickFormatter={formatCurrency}
                 />
                 <YAxis 
                   type="category"  
-                  dataKey="nombre_drogueria" 
+                  dataKey="nombre_cliente" 
                   width={200} 
                 />
                 <Legend />
-                <Bar dataKey="total_comprado" barSize={12} fill="#ff5e5e" isAnimationActive={true} animationDuration={1500}>
+                <Bar dataKey="total_vendido" barSize={12} fill="#ff5e5e" isAnimationActive={true} animationDuration={1500}>
                   <LabelList 
-                    dataKey="total_comprado" 
+                    dataKey="total_vendido" 
                     position="right" 
                     formatter={formatCurrency}
                   />
@@ -203,37 +196,38 @@ useEffect(()=>{
 
 <br /><br />
 
-  <div style={{ flex: '0 0 48%', marginBottom: '20px' }}>
-    <h5 style={{textAlign: 'center'}}>TOP PRODUCTOS MAS COMPRADOS</h5>
-    {productosmascomprados.length === 0 ?(
-      <DataReportes/>
-    ) : (
-      <ResponsiveContainer width="95%" height={500}>
-              <BarChart data={productosmascomprados} layout="vertical">
-                <CartesianGrid strokeDasharray="8 8" />
-                <XAxis
-                  type="number"
-                  domain={[0, productosmascomprados.length > 0 ? Math.max(...productosmascomprados.map(item => item.total_cantidad)) * 1.5 : 1000]}
-                />
-                <YAxis 
-                  type="category"  
-                  dataKey="nombre_producto" 
-                  width={200} 
-                />
-                <Legend />
-                <Bar dataKey="total_cantidad" barSize={12} fill="#943e29ff" isAnimationActive={true} animationDuration={1500}>
-                  <LabelList 
-                    dataKey="total_cantidad" 
-                    position="right" 
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-    )}
-  </div>
+ <div className="col" style={{ flex: '1 1 45%', marginTop: '100px', minWidth: '300px' }}>
+           <h5 style={{textAlign: 'center'}}>TOTAL VENDIDO METODO DE PAGO</h5>
+          <div>
+              {totalvendidometodos.length === 0 ? (
+                  <DataReportes />
+              ) : (
+                  <ResponsiveContainer width="100%" height={500}>
+                  <PieChart>
+                     <Pie
+                        data={totalvendidometodos.map(item => ({...item,total_vendido: parseFloat(item.total_vendido)}))}
+                        dataKey="total_vendido"
+                        nameKey="metodo_pago"
+                        innerRadius={120}
+                        outerRadius={200}
+                        fill="#82ca9d"
+                        label={({ metodo_pago, total_vendido }) =>
+                          `${metodo_pago}: ${formatCurrency(total_vendido)}`
+                        }
+                      >
+                        {totalvendidometodos.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={Colors[index % Colors.length]} />
+                        ))}
+                      </Pie>
+
+                  </PieChart>
+                  </ResponsiveContainer>
+              )}
+          </div>
+</div>
 
 </>
   )
 }
 
-export default Reportes
+export default ReporteVenta
