@@ -1,6 +1,16 @@
 const {connection} = require('../database/config.js')
 
 
+const verClientesConCredito = (req,res) => {
+    connection.query('SELECT * FROM clientes WHERE Estado = 1 AND monto_credito > 0', (error,results)=> {
+        if (error) throw error
+        res.json(results)
+    })
+}
+
+
+
+
 const movimientosclientes = (req,res) =>{
    console.log('Body recibido movimiento:', req.body);
   connection.query("INSERT INTO movimientosclientes SET ?",{
@@ -112,4 +122,4 @@ const registrarPago = (req,res) => {
 } 
 
 
-module.exports = {movimientosclientes, verElCreditoCompleto,registrarPago}
+module.exports = {movimientosclientes, verElCreditoCompleto,registrarPago,verClientesConCredito}

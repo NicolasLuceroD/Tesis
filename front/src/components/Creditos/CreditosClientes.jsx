@@ -67,7 +67,7 @@ const handleCloseModalProductos = () => setShowModalProductos(false)
 
 //TRAER CLIENTES
 const verClientes = () => {
-  axios.get(`${URL}clientes/verClientes`).then((response) => {
+  axios.get(`${URL}credito/verClientesConCredito`).then((response) => {
     console.log('CLientes obtenidos de mi consulta: ',response.data)
     setClientes(response.data)
     setVer(response.data)
