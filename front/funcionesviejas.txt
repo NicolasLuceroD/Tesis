@@ -148,3 +148,42 @@ const FinalizarVenta = () => {
                   </option>
                 ))}
               </Form.Select>
+
+
+//const totalVentasDia = (req, res) => {
+    const idUsuario = req.params.idUsuario;
+    const idApertura = req.params.idApertura; 
+
+    //1) - Ventas del usuario: Suma todo lo que vendió ese usuario, siempre que no haya usado el metodo de pago con Id 5 (a credito),solo cuenta las ventas hechas desde la fecha de apertura de caja indicada
+    //2) - Pagos de clientes: Suma todos los pagos de clientes, solo los que se hicieron desde la apertura de caja,
+    //3) - Monto inicial de la caja: Toma el monto con el que se abrió la caja,
+    //Resultado esperado: ventas + pagosclientes + monto_inicial
+    connection.query(`
+        SELECT
+            IFNULL(
+                (SELECT SUM(precioTotal_Venta)
+                 FROM venta
+                 WHERE Id_usuario = ?
+                   AND Id_metodoPago != 5
+                   AND fecha_registro >= (SELECT fecha_apertura 
+                                          FROM aperturas_caja 
+                                          WHERE Id_apertura = ?)), 0)
+        +
+            IFNULL(
+                (SELECT SUM(monto)
+                 FROM pagosclientes
+                 WHERE fecha_pago >= (SELECT fecha_apertura 
+                                      FROM aperturas_caja 
+                                      WHERE Id_apertura = ?)), 0)
+        +
+            IFNULL(
+                (SELECT monto_inicial
+                 FROM aperturas_caja
+                 WHERE Id_apertura = ?), 0) AS total_esperado`, [idUsuario, idApertura, idApertura, idApertura], (error, results) => {
+        if (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error al calcular total esperado' });
+        }
+        res.json({ total_esperado: results[0].total_esperado });
+    });
+};

@@ -1,4 +1,4 @@
-import { useEffect,useContext } from 'react';
+import { useEffect,useContext, useState} from 'react';
 import { Button, NavDropdown } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -17,6 +17,10 @@ function App() {
 //URL
 const { URL } = useContext(DataContext)
 
+//ESTADOS
+const [desgloseventa, setDesgloseVenta] = useState([])
+const [montoinicial, setMontoInicial] = useState([])
+
 //OBTENER APERTURA POR LOCAL STORAGE
 const idApertura = localStorage.getItem('idApertura')
 
@@ -25,14 +29,94 @@ const cerrarTurno = async () => {
   try {
     const idUsuario = localStorage.getItem('idUsuario');
 
+    // 🔹 Traer desglose actualizado ANTES de generar el modal
+    const desgloseResponse = await axios.get(`${URL}caja/desgloseVenta/${idUsuario}/${idApertura}`);
+    setDesgloseVenta(desgloseResponse.data);
+
     // 1️⃣ Traer total esperado de la caja
     const response = await axios.get(`${URL}caja/totalVentasDia/${idUsuario}/${idApertura}`);
     const totalEsperado = response.data.total_esperado;
 
-    // 2️⃣ Mostrar Swal con total esperado y un input para monto real
+    // ✅ Estructura visual del desglose (sin modificar tu lógica)
+    const desgloseHTML = desgloseResponse.data.map(d => {
+    const esCredito = d.metodo.toUpperCase() === 'A CREDITO';
+    const color = esCredito ? '#dc2626' : '#16a34a'; // rojo si es A CREDITO, verde en caso contrario
+    const signo = esCredito ? '+' : '+';
+
+  return `
+    <div style="
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+      color: #444;
+    ">
+      <span style="font-weight: 500;">${d.metodo}</span>
+      <span style="font-weight: 600; color: ${color};">
+        ${signo} ${formatCurrency(d.total)}
+      </span>
+    </div>
+  `;
+}).join('');
+
+    // 2️⃣ Mostrar Swal con monto inicial + desglose + total esperado
     Swal.fire({
       title: 'Cierre de Turno',
-      html: `<p>Total esperado en caja: <b>${formatCurrency(totalEsperado)}</b></p>`,
+      html: `
+        <div style="text-align:left; font-family: 'Inter', sans-serif; color:#333;">
+          <div style="
+            background:#f8fafc;
+            border:1px solid #e5e7eb;
+            border-radius:8px;
+            padding:10px 12px;
+            margin-bottom:10px;
+          ">
+            <p style="
+                margin:0; 
+                font-size:14px; 
+                display:flex; 
+                justify-content:space-between; 
+                align-items:center;
+              ">
+                <span style="font-weight:500;"><b>TOTAL ESPERADO EN CAJA:</b></span>
+                <span style="font-weight:700; color:#2563eb; font-size:20px;">
+                  ${formatCurrency(totalEsperado)}
+                </span>
+            </p>
+          </div>
+
+          <div style="
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:8px;
+            padding:10px 12px;
+            margin-bottom:10px;
+          ">
+            ${desgloseHTML}
+          </div>
+
+          <div style="
+            background:#f1f5f9;
+            border-radius:8px;
+            padding:10px 12px;
+          ">
+        <p style="
+            margin:0; 
+            font-size:14px; 
+            display:flex; 
+            justify-content:space-between; 
+            align-items:center;
+          ">
+            <span style="font-weight:500;"><b>MONTO INICIAL DE APERTURA:</b></span>
+            <span style="font-weight:600; color:#15803d; font-size:15px;">
+              ${formatCurrency(montoinicial)}
+            </span>
+        </p>
+          </div>
+        </div>
+      `,
       input: 'number',
       inputLabel: 'Ingrese el monto contado en caja',
       inputAttributes: {
@@ -50,7 +134,7 @@ const cerrarTurno = async () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const montoReal = parseFloat(result.value);
-        const diferencia = totalEsperado - montoReal
+        const diferencia = totalEsperado - montoReal;
 
         // 3️⃣ Enviar cierre de caja al backend
         await axios.post(`${URL}caja/registrarCierreCaja`, {
@@ -69,7 +153,7 @@ const cerrarTurno = async () => {
           showConfirmButton: false
         });
 
-        // Limpiar sesión y redirigir
+        // 4️⃣ Limpiar sesión y redirigir
         localStorage.removeItem('nombreUsuario');
         localStorage.removeItem('token');
         localStorage.removeItem('tokenExpiration');
@@ -92,6 +176,29 @@ const cerrarTurno = async () => {
 
 
   const navigate = useNavigate();
+
+  const obtenerDesgloseVenta = () => {
+    const idUsuario = localStorage.getItem('idUsuario')
+
+   axios.get(`${URL}caja/desgloseVenta/${idUsuario}/${idApertura}`).then((response) => {
+    setDesgloseVenta(response.data);
+    console.log('Desglose venta: ', response.data);
+  })
+  .catch((error) => {
+    console.error('Error al obtener desglose de venta:', error);
+  });
+}
+
+const obtenerMontoInicial = () => {
+  const idApertura = localStorage.getItem('idApertura')
+
+  axios.get(`${URL}caja/montoinicialapertura/${idApertura}`).then((response) => {
+    setMontoInicial(response.data[0].monto_inicial);
+    console.log('Monto inicial: ', response.data)
+  }).catch((error) => {
+    console.error('Error al obtener monto inicial',error)
+  })
+}
 
   useEffect(() => {
     const checkTokenExpiration = () => {
@@ -127,6 +234,11 @@ const cerrarTurno = async () => {
     return () => clearInterval(interval);
   }, [navigate]);
 
+
+  useEffect(()=>{
+    obtenerDesgloseVenta()
+    obtenerMontoInicial()
+  },[])
 
   return (
     <>

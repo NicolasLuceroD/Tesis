@@ -696,7 +696,7 @@ useEffect(()=>{
                 type="number"
                 placeholder="$0,00"
                 value={montorecibido}
-                onChange={(e) => setMontoRecibido(Number(e.target.value))}
+                onChange={(e) => setMontoRecibido(Number(e.target.value) || 0)}
               />
             </Form.Group>
 

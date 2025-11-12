@@ -49,7 +49,7 @@ const totalVentasDia = (req, res) => {
                 (SELECT SUM(precioTotal_Venta)
                  FROM venta
                  WHERE Id_usuario = ?
-                   AND Id_metodoPago != 5
+                 AND Id_metodoPago != 5
                    AND fecha_registro >= (SELECT fecha_apertura 
                                           FROM aperturas_caja 
                                           WHERE Id_apertura = ?)), 0)
@@ -73,4 +73,53 @@ const totalVentasDia = (req, res) => {
     });
 };
 
-module.exports = {registrarAperturaCaja,totalVentasDia,registrarCierreCaja}
+const desgloseVenta = (req,res) => {
+    const idUsuario = req.params.idUsuario
+    const idApertura = req.params.idApertura
+
+    connection.query(`SELECT metodo, SUM(total) AS total
+                        FROM (
+                        -- 🔹 Parte 1: Ventas
+                        SELECT 
+                            mp.nombre_metodopago AS metodo,
+                            SUM(v.precioTotal_Venta) AS total
+                        FROM venta v
+                        INNER JOIN metodopago mp ON v.Id_metodoPago = mp.Id_metodoPago
+                        WHERE v.Id_usuario = ?
+                            AND v.fecha_registro >= (
+                            SELECT fecha_apertura FROM aperturas_caja WHERE Id_apertura = ?
+                            )
+                        GROUP BY mp.nombre_metodopago
+
+                        UNION ALL
+
+                        -- 🔹 Parte 2: Pagos de clientes
+                        SELECT 
+                            mp.nombre_metodopago AS metodo,
+                            SUM(p.monto) AS total
+                        FROM pagosclientes p
+                        INNER JOIN metodopago mp ON p.Id_metodoPago = mp.Id_metodoPago
+                        WHERE p.Id_usuario = ?
+                            AND p.fecha_pago >= (
+                            SELECT fecha_apertura FROM aperturas_caja WHERE Id_apertura = ?
+                            )
+                        GROUP BY mp.nombre_metodopago
+                        ) AS resumen
+                        GROUP BY metodo;`,[idUsuario, idApertura, idUsuario, idApertura], (error,results) => {
+                            if (error) {
+                                console.error(error)
+                                return res.status(500).json({ error: 'Error al obtener desglose de ventas' });
+                            }
+                            res.json(results)
+                        })
+}
+
+const montoInicialApertura = (req,res) => {
+    const idApertura = req.params.idApertura
+    connection.query(`SELECT monto_inicial FROM aperturas_caja WHERE Id_apertura = ?`,[idApertura], (error,results) => {
+        if (error) throw error
+        res.json(results)
+    })
+}
+
+module.exports = {registrarAperturaCaja,totalVentasDia,registrarCierreCaja, desgloseVenta, montoInicialApertura}
