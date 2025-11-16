@@ -515,10 +515,11 @@ useEffect(()=>{
                                   <small>Stock disponible: {loteCercano.cantidad_disponible}</small><br />
                                   <small>Lote: {loteCercano.nro_lote}</small><br />
 
-                                  {prod.lotes.some(l => new Date(l.fecha_vencimiento) > new Date(loteCercano.fecha_vencimiento)) && (
-                                    <small style={{ color: "green", fontWeight: "bold" }}>
-                                      📦 Hay más stock en otro lote, no te preocupes!
-                                    </small>
+                                  {/* ¿Existe otro lote válido, distinto al lote actual, que tenga stock disponible? */}
+                                  {lotesValidos.some(l => l.nro_lote !== loteCercano.nro_lote && l.cantidad_disponible > 0) && (
+                                        <small style={{ color: "green", fontWeight: "bold" }}>
+                                          📦 Hay más stock en otro lote, no te preocupes!
+                                        </small>
                                   )}
 
                                   {/* Nuevo cálculo solo con lotes válidos */}
