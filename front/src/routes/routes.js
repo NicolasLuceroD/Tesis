@@ -29,3 +29,6 @@ export const login = '/'
 export const venta = '/venta'
 export const detalleventa = '/detalleventa'
 
+//MOVIMIENTO USUARIOS
+export const movusuarios = '/movusuarios'
+

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCreditCard, faDoorOpen, faFileAlt, faShoppingCart, faUsers, faBoxOpen, faTags, faUser, faClinicMedical, faTools, faChartPie, faCashRegister, faHandshake } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard, faDoorOpen, faFileAlt, faShoppingCart, faUsers, faBoxOpen, faTags, faUser, faClinicMedical, faTools, faChartPie, faCashRegister, faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { DataContext } from '../src/context/DataContext'
 import axios from 'axios';
 import { formatCurrency } from '../src/components/Utils/formatCurrency'
@@ -263,6 +263,11 @@ const obtenerMontoInicial = () => {
 
       <Nav.Link as={Link} to="/stock" className="text-white">
         <FontAwesomeIcon icon={faBoxOpen} /> STOCK
+      </Nav.Link>
+
+      
+      <Nav.Link as={Link} to="/movusuarios" className="text-white">
+        <FontAwesomeIcon icon={faArrowsRotate} /> MOVIMIENTOS USUARIOS
       </Nav.Link>
 
     {/* DROPDWON DE COMPRAS */}
