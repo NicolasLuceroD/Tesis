@@ -279,7 +279,7 @@ useEffect(()=>{
           />
           <YAxis type="category" dataKey="nombre_producto" width={200} />
           <Legend />
-          <Bar dataKey="costo_promedio" barSize={12} fill="#943e29ff">
+          <Bar dataKey="costo_promedio" barSize={12} fill="#ff8c42">
             <LabelList
               dataKey="costo_promedio"
               position="right"
