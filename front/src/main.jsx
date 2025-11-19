@@ -21,7 +21,7 @@ import Droguerias from './components/CRUDS/Droguerias.jsx'
 import Compra from './components/Compras/Compra.jsx'
 import DetalleCompra from './components/Compras/DetalleCompra.jsx'
 import Stock from './components/Stock.jsx'
-import Reportes from './components/Reportes.jsx'
+import ReportesCompras from './components/Auditorias/ReportesCompras.jsx'
 import CreditosClientes from './components/Creditos/CreditosClientes.jsx'
 import ReporteVenta from './components/Auditorias/ReporteVenta.jsx'
 import MovimientoUsuarios from './components/MovimientoUsuarios.jsx'
@@ -47,7 +47,7 @@ createRoot(document.getElementById('root')).render(
           <Route path={compra} element={<Compra/>}/>        
           <Route path={detallecompra} element={<DetalleCompra/>}/>
           <Route path={stock} element={<Stock/>}/>
-          <Route path={reportes} element={<Reportes/>}/>
+          <Route path={reportes} element={<ReportesCompras/>}/>
           <Route path={creditosc} element={<CreditosClientes/>}/>
           <Route path={reporteventa} element={<ReporteVenta/>}/>
           <Route path={movusuarios} element={<MovimientoUsuarios/>}/>

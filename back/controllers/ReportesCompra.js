@@ -60,4 +60,20 @@ const verPromedioGasto = (req,res) => {
                         })
 }
 
-module.exports = {verTotalDrogueria,verMontoTotalComprado,verTopProductosComprados,verPromedioGasto}
+const verPrecioCostoPromedio = (req,res) => {
+    const {fechaInicio , fechaFin} = req.query
+    connection.query(`SELECT 
+                            p.nombre_producto,
+                            AVG(dc.Precio_costo) AS costo_promedio
+                        FROM detallecompra dc
+                        JOIN productos p ON p.Id_producto = dc.Id_producto
+                        WHERE DATE(dc.Fecha_registro) BETWEEN ? AND ?
+                        GROUP BY dc.Id_producto
+                        ORDER BY costo_promedio DESC
+                        LIMIT 5`,[fechaInicio, fechaFin],(error,results) => {
+                            if (error) throw error
+                            res.json(results)
+                        })
+}
+
+module.exports = {verTotalDrogueria,verMontoTotalComprado,verTopProductosComprados,verPromedioGasto,verPrecioCostoPromedio}

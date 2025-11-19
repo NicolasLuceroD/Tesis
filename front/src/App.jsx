@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCreditCard, faDoorOpen, faFileAlt, faShoppingCart, faUsers, faBoxOpen, faTags, faUser, faClinicMedical, faTools, faChartPie, faCashRegister, faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard, faDoorOpen, faFileAlt, faShoppingCart, faUsers, faBoxOpen, faTags, faUser, faClinicMedical, faTools, faChartPie, faCashRegister, faArrowsRotate, faBarChart } from '@fortawesome/free-solid-svg-icons';
 import { DataContext } from '../src/context/DataContext'
 import axios from 'axios';
 import { formatCurrency } from '../src/components/Utils/formatCurrency'
@@ -313,8 +313,12 @@ const obtenerMontoInicial = () => {
 
     {/* DROPDOWN DE REPORTES */}
       <NavDropdown title={<><FontAwesomeIcon icon={faChartPie} className='me-2' />AUDITORIAS</>} id="nav-dropdown-reportes">
-        <NavDropdown.Item as={Link} to="/reporteventa">REPORTE VENTAS</NavDropdown.Item>
-        <NavDropdown.Item as={Link} to="/reportes">REPORTE COMPRA</NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/reporteventa">
+            <FontAwesomeIcon icon={faChartPie} /> REPORTE VENTAS
+        </NavDropdown.Item>
+        <NavDropdown.Item as={Link} to="/reportes">
+          <FontAwesomeIcon icon={faBarChart} /> REPORTE COMPRA
+        </NavDropdown.Item>
       </NavDropdown>
     </Nav>
 

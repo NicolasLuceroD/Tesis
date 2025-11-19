@@ -20,7 +20,7 @@ import {
 } from 'recharts';
 import axios from 'axios'
 import { format } from 'date-fns'
-
+import ScrollToTopButton from '../Utils/ScrollToTopButton'
 
 const ReporteVenta = () => {
 
@@ -485,7 +485,7 @@ useEffect(()=>{
     </div>
   )}
 </div>
-
+<ScrollToTopButton/>
 </div>
 </>
   )

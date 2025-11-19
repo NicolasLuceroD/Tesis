@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext} from "react"
-import App from "../App"
-import { DataContext } from "../context/DataContext"
+import App from "../../App"
+import { DataContext } from "../../context/DataContext"
 import DatePicker from 'react-datepicker'
 import es from 'date-fns/locale/es';
 import "react-datepicker/dist/react-datepicker.css";
-import DataReportes from "./Common/DataReportes";
+import DataReportes from "../Common/DataReportes";
 import {
   ResponsiveContainer,
   BarChart,
@@ -19,7 +19,7 @@ import axios from 'axios'
 import { format } from 'date-fns'
 
 
-const Reportes = () => {
+const ReportesCompras = () => {
 
 //URL
 const { URL } = useContext(DataContext)
@@ -29,6 +29,7 @@ const [totalDrogueria, setTotalDrogueria] = useState([])
 const [montototalComprado, setMontoTotalComprado] = useState([])
 const [productosmascomprados, setProductosMasComprados] = useState([])
 const [promediogasto, setPromedioGasto] = useState([])
+const [precioCostoPromedio, setPrecioCostoPromedio] = useState([])
 
 
 //ESTADO PARA CALENDARIO
@@ -44,7 +45,7 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd');
       const fin = format(fechaFin, 'yyyy-MM-dd');
-      axios.get(`${URL}reportes/verTotalDrogueria`,{
+      axios.get(`${URL}reportescompra/verTotalDrogueria`,{
         params: 
         {
           fechaInicio: inicio,
@@ -64,7 +65,7 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd');
       const fin = format(fechaFin, 'yyyy-MM-dd');
-      axios.get(`${URL}reportes/verMontoTotalComprado`,{
+      axios.get(`${URL}reportescompra/verMontoTotalComprado`,{
         params: 
         {
           fechaInicio: inicio,
@@ -84,7 +85,7 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd')
       const fin = format(fechaFin, 'yyyy-MM-dd')
-      axios.get(`${URL}reportes/verTopProductosComprados`,{
+      axios.get(`${URL}reportescompra/verTopProductosComprados`,{
         params: 
         {
           fechaInicio: inicio,
@@ -102,7 +103,7 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     if (fechaInicio && fechaFin) {
       const inicio = format(fechaInicio, 'yyyy-MM-dd')
       const fin = format(fechaFin, 'yyyy-MM-dd')
-      axios.get(`${URL}reportes/verPromedioGasto`, {
+      axios.get(`${URL}reportescompra/verPromedioGasto`, {
         params: 
         {
           fechaInicio: inicio,
@@ -114,6 +115,23 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     }
   }
 
+  //TRAER PRECIO COSTO PROMEDIO DE PRODUCTOS
+    const verPrecioCostoPromedio = () => {
+    if (fechaInicio && fechaFin) {
+      const inicio = format(fechaInicio, 'yyyy-MM-dd')
+      const fin = format(fechaFin, 'yyyy-MM-dd')
+      axios.get(`${URL}reportescompra/verPrecioCostoPromedio`, {
+        params: 
+        {
+          fechaInicio: inicio,
+          fechaFin: fin
+        }
+      }).then((response)=> {
+        setPrecioCostoPromedio(response.data)
+        console.log('Costo promedio', response.data)
+      })
+    }
+  }
 
 
 //FUNCION FORMATO MONEDA
@@ -131,6 +149,7 @@ useEffect(()=>{
   verTotalGastado()
   verProductosMasComprados()
   verPromedioGastoPorCompra()
+  verPrecioCostoPromedio()
 },[fechaInicio, fechaFin])
 
 
@@ -171,70 +190,111 @@ useEffect(()=>{
   <p>PROMEDIO DE GASTO POR COMPRA (%) : <strong>{formatCurrency(promediogasto)}</strong></p>
 </div>
 
-<div style={{ flex: '0 0 48%', marginBottom: '20px' }}>
-    <h5 style={{textAlign: 'center'}}>TOTAL COMPRADO A DROGUERIAS</h5>
-    {totalDrogueria.length === 0 ?(
-      <DataReportes/>
+<div className="dashboard-grid">
+
+  {/* ───────────────────────────────────────── */}
+  {/* TOTAL COMPRADO A DROGUERIAS */}
+  <div className="chart-box" style={{ marginTop: "100px" }}>
+    <h5 style={{ textAlign: 'center' }}>TOTAL COMPRADO A DROGUERIAS</h5>
+    {totalDrogueria.length === 0 ? (
+      <DataReportes />
     ) : (
       <ResponsiveContainer width="95%" height={500}>
-              <BarChart data={totalDrogueria} layout="vertical">
-                <CartesianGrid strokeDasharray="8 8" />
-                <XAxis
-                  type="number"
-                  domain={[0, totalDrogueria.length > 0 ? Math.max(...totalDrogueria.map(item => item.total_comprado)) * 1.5 : 1000]}
-                  tickFormatter={formatCurrency}
-                />
-                <YAxis 
-                  type="category"  
-                  dataKey="nombre_drogueria" 
-                  width={200} 
-                />
-                <Legend />
-                <Bar dataKey="total_comprado" barSize={12} fill="#ff5e5e" isAnimationActive={true} animationDuration={1500}>
-                  <LabelList 
-                    dataKey="total_comprado" 
-                    position="right" 
-                    formatter={formatCurrency}
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+        <BarChart data={totalDrogueria} layout="vertical">
+          <CartesianGrid strokeDasharray="8 8" />
+          <XAxis
+            type="number"
+            domain={[
+              0,
+              totalDrogueria.length > 0
+                ? Math.max(...totalDrogueria.map(item => item.total_comprado)) * 1.5
+                : 1000
+            ]}
+            tickFormatter={formatCurrency}
+          />
+          <YAxis type="category" dataKey="nombre_drogueria" width={200} />
+          <Legend />
+          <Bar dataKey="total_comprado" barSize={12} fill="#ff5e5e">
+            <LabelList
+              dataKey="total_comprado"
+              position="right"
+              formatter={formatCurrency}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     )}
   </div>
 
-<br /><br />
-
-  <div style={{ flex: '0 0 48%', marginBottom: '20px' }}>
-    <h5 style={{textAlign: 'center'}}>TOP PRODUCTOS MAS COMPRADOS</h5>
-    {productosmascomprados.length === 0 ?(
-      <DataReportes/>
+  {/* ───────────────────────────────────────── */}
+  {/* TOP PRODUCTOS MÁS COMPRADOS */}
+  <div className="chart-box" style={{ marginTop: "100px" }}>
+    <h5 style={{ textAlign: 'center' }}>TOP PRODUCTOS MÁS COMPRADOS</h5>
+    {productosmascomprados.length === 0 ? (
+      <DataReportes />
     ) : (
       <ResponsiveContainer width="95%" height={500}>
-              <BarChart data={productosmascomprados} layout="vertical">
-                <CartesianGrid strokeDasharray="8 8" />
-                <XAxis
-                  type="number"
-                  domain={[0, productosmascomprados.length > 0 ? Math.max(...productosmascomprados.map(item => item.total_cantidad)) * 1.5 : 1000]}
-                />
-                <YAxis 
-                  type="category"  
-                  dataKey="nombre_producto" 
-                  width={200} 
-                />
-                <Legend />
-                <Bar dataKey="total_cantidad" barSize={12} fill="#943e29ff" isAnimationActive={true} animationDuration={1500}>
-                  <LabelList 
-                    dataKey="total_cantidad" 
-                    position="right" 
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+        <BarChart data={productosmascomprados} layout="vertical">
+          <CartesianGrid strokeDasharray="8 8" />
+          <XAxis
+            type="number"
+            domain={[
+              0,
+              productosmascomprados.length > 0
+                ? Math.max(...productosmascomprados.map(item => item.total_cantidad)) * 1.5
+                : 1000
+            ]}
+          />
+          <YAxis type="category" dataKey="nombre_producto" width={200} />
+          <Legend />
+          <Bar dataKey="total_cantidad" barSize={12} fill="#943e29ff">
+            <LabelList
+              dataKey="total_cantidad"
+              position="right"
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     )}
   </div>
+
+  {/* ───────────────────────────────────────── */}
+  {/* PRECIO DE COSTO PROMEDIO */}
+  <div className="chart-box" style={{ marginTop: "100px" }}>
+    <h5 style={{ textAlign: 'center' }}>PRECIO DE COSTO PROMEDIO</h5>
+    {precioCostoPromedio.length === 0 ? (
+      <DataReportes />
+    ) : (
+      <ResponsiveContainer width="95%" height={500}>
+        <BarChart data={precioCostoPromedio} layout="vertical">
+          <CartesianGrid strokeDasharray="8 8" />
+          <XAxis
+            type="number"
+            domain={[
+              0,
+              precioCostoPromedio.length > 0
+                ? Math.max(...precioCostoPromedio.map(item => item.costo_promedio)) * 1.5
+                : 1000
+            ]}
+          />
+          <YAxis type="category" dataKey="nombre_producto" width={200} />
+          <Legend />
+          <Bar dataKey="costo_promedio" barSize={12} fill="#943e29ff">
+            <LabelList
+              dataKey="costo_promedio"
+              position="right"
+              formatter={value => formatCurrency(value)}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    )}
+  </div>
+
+</div>
 
 </>
   )
 }
 
-export default Reportes
+export default ReportesCompras
