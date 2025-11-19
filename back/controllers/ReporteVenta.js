@@ -89,5 +89,22 @@ const verUsosPresentacion = (req,res) => {
                         })
 }
 
+const verGananciasPorCategorias = (req,res) => {
+       const {fechaInicio, fechaFin} = req.query
+        connection.query(`SELECT
+                                c.nombre_categoria,
+                                SUM(dv.cantidadVendida * (dv.precioAplicado - p.precio_costo)) AS ganancia
+                            FROM detalleventa dv
+                            JOIN venta v ON dv.Id_venta = v.Id_venta
+                            JOIN productos p ON dv.Id_producto = p.Id_producto
+                            JOIN categoria c ON p.Id_categoria = c.Id_categoria
+                            WHERE DATE(v.fecha_registro) BETWEEN ? AND ?
+                            GROUP BY c.Id_categoria
+                            ORDER BY ganancia DESC`,[fechaInicio, fechaFin],(error,results) => {
+                            if (error) throw error
+                            res.json(results)
+                        })
+}
 
-module.exports = {verTotalVendido,verTotalVendidoClientes,verTotalVendidoMetodos, verResumenVentas, verProductosMasVendidos, verUsosPresentacion}
+
+module.exports = {verTotalVendido,verTotalVendidoClientes,verTotalVendidoMetodos, verResumenVentas, verProductosMasVendidos, verUsosPresentacion, verGananciasPorCategorias}

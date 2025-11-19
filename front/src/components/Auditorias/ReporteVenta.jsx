@@ -34,6 +34,7 @@ const [totalvendidometodos, setTotalVendidoMetodos] = useState([])
 const [resumenventas, setResumenVentas] = useState([])
 const [productosmasvendidos, setProductosMasVendidos] = useState([])
 const [usosporpresentacion, setUsosPorPresentacion] = useState([])
+const [gananciaxcategoria, setGananciaXCategoria] = useState([])
 
 //ESTADO PARA CALENDARIO
 const [fechaInicio, setFechaInicio] = useState(null);
@@ -155,6 +156,24 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     }
   }
 
+   //TRAER GANANCIAS POR CATEGORIAS
+  const verGananciasPorCategoria = () => {
+     if (fechaInicio && fechaFin){
+      const inicio = format(fechaInicio, 'yyyy-MM-dd')
+      const fin = format(fechaFin, 'yyyy-MM-dd')
+      axios.get(`${URL}reporteventa/verGananciasPorCategorias`,{
+        params: 
+        {
+          fechaInicio: inicio,
+          fechaFin: fin
+        }
+      }).then((response) => {
+        setGananciaXCategoria(response.data)
+        console.log('ganancia: ',response.data)
+      })
+    }
+  }
+
 
 //FUNCION FORMATO MONEDA
 const formatCurrency = (value) => {
@@ -168,7 +187,7 @@ const formatCurrency = (value) => {
 const Colors = [
   "#ff5e5e", // rojo coral (base)
   "#ff8c42", // naranja cálido
-  "#ff3d71", // fucsia intenso
+  "#723502ff", // fucsia intenso
   "#ffb84d", // dorado suave
   "#e63e3e"  // rojo oscuro
 ];
@@ -183,6 +202,7 @@ useEffect(()=>{
   verResumenVentas()
   verProductosMasVendidos()
   verUsosPorPresentacion()
+  verGananciasPorCategoria()
 },[fechaInicio, fechaFin])
 
 
@@ -222,8 +242,9 @@ useEffect(()=>{
   <p>MONTO TOTAL VENDIDO A LA FECHA: <strong>{formatCurrency(totalvendido)}</strong></p>
 </div>
 
-<div className="dashboard-grid">
+<br /><br />
 
+<div className="dashboard-grid">
   {/* ───────────────────────────────────────── */}
   {/* TOTAL VENDIDO A CLIENTES */}
   <div className="chart-box">
@@ -264,7 +285,7 @@ useEffect(()=>{
   ) : (
     <div
       style={{
-        width: 420,           // 🔥 MÁS ANCHO PARA QUE NO SE CORTEN
+        width: 420,          
         height: 330,
         margin: "0 auto",
         display: "flex",
@@ -275,7 +296,7 @@ useEffect(()=>{
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            cx="50%"           // 🔥 FIJA LA POSICIÓN, EVITA RECORTES
+            cx="50%"          
             cy="50%"
             data={totalvendidometodos.map(item => ({
               ...item,
@@ -287,9 +308,7 @@ useEffect(()=>{
             outerRadius={100}
             paddingAngle={2}
             labelLine={true}
-            label={({ total_vendido }) =>
-              `${formatCurrency(total_vendido)}`
-            }
+            label={({ total_vendido }) => `${formatCurrency(total_vendido)}`}
           >
             {totalvendidometodos.map((entry, index) => (
               <Cell key={index} fill={Colors[index % Colors.length]} />
@@ -347,9 +366,10 @@ useEffect(()=>{
   )}
 </div>
 
+
   {/* ───────────────────────────────────────── */}
   {/* TOP PRODUCTOS MÁS VENDIDOS */}
-  <div className="chart-box">
+  <div className="chart-box" style={{ marginTop: "100px" }}>
     <h5 style={{ textAlign: 'center' }}>TOP PRODUCTOS MÁS VENDIDOS</h5>
     {productosmasvendidos.length === 0 ? (
       <DataReportes />
@@ -382,7 +402,7 @@ useEffect(()=>{
 
   {/* ───────────────────────────────────────── */}
   {/* USOS POR PRESENTACIÓN */}
- <div className="chart-box">
+ <div className="chart-box" style={{ marginTop: "100px" }}>
   <h5 style={{ textAlign: 'center' }}>USOS POR PRESENTACIÓN</h5>
   {usosporpresentacion.length === 0 ? (
     <DataReportes />
@@ -410,6 +430,49 @@ useEffect(()=>{
             paddingAngle={2}
             labelLine={true}
             label={({ cantidad_usos }) => cantidad_usos}
+            labelStyle={{ fontSize: 11 }}
+          >
+            {usosporpresentacion.map((entry, index) => (
+              <Cell key={index} fill={Colors[index % Colors.length]} />
+            ))}
+          </Pie>
+          <Legend verticalAlign="bottom" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  )}
+</div>
+
+  {/* ───────────────────────────────────────── */}
+  {/* GANANCIA X CATEGORIA */}
+ <div className="chart-box" style={{ marginTop: "100px" }}>
+  <h5 style={{ textAlign: 'center' }}>GANANCIA X CATEGORIA </h5>
+  {gananciaxcategoria.length === 0 ? (
+    <DataReportes />
+  ) : (
+    <div
+      style={{
+        width: 420,
+        height: 330,
+        margin: "0 auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            cx="50%"          
+            cy="50%"
+            data={gananciaxcategoria.map((item) => ({...item,ganancia: parseFloat(item.ganancia)}))}
+            dataKey="ganancia"
+            nameKey="nombre_categoria"
+            innerRadius={70}
+            outerRadius={100}
+            paddingAngle={2}
+            labelLine={true}
+            label={({ ganancia }) => `${formatCurrency(ganancia)}`}
             labelStyle={{ fontSize: 11 }}
           >
             {usosporpresentacion.map((entry, index) => (
