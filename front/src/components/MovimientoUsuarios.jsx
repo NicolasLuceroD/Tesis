@@ -1,7 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
 import { DataContext } from '../context/DataContext'
+import { formatCurrency } from './Utils/formatCurrency'
 import App from '../App'
 import axios from 'axios'
+import DatePicker from 'react-datepicker'
+import es from 'date-fns/locale/es';
 
 const MovimientoUsuarios = () => {
 
@@ -10,11 +13,7 @@ const { URL } = useContext(DataContext)
 
 //ESTADOS
 const [movimientos, setMovimientos] = useState([])
-
-
-
-
-
+const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
 
 //TRAER MOVIMIENTOS
 const verMovimientos = () => {
@@ -24,17 +23,16 @@ const verMovimientos = () => {
     })
 }
 
-
+//OBTENER EL ULTIMO DIA DEL MES
+const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
 
 useEffect(()=>{
     verMovimientos()
 },[])
 
 
-
-
   return (
-    <>
+   <>
         <App/>
         <div className="h3-subtitulos">
             <h3>MOVIMIENTO USUARIOS</h3>
@@ -44,6 +42,17 @@ useEffect(()=>{
         </h2>
         <br /><br />
 
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '10px', marginBottom: '10px' }}>
+                <DatePicker
+                        selected={fechaSeleccionada}
+                        onChange={(date) => setFechaSeleccionada(date)}
+                        className='form-control custom-date-picker custom-datepicker-wrapper'
+                        dateFormat="yyyy/MM/d"
+                        placeholderText='Ingrese una fecha'
+                        locale={es}
+                        maxDate={lastDayOfMonth}
+                />
+        </div>
 
         <table className='custom-table'>
             <thead>
@@ -62,13 +71,13 @@ useEffect(()=>{
                 {movimientos.map((val) => (
                     <tr key={val.Id_apertura}>
                     <td>{val.Id_apertura}</td>
-                    <td>{val.usuario}</td>
-                    <td>{val.fecha_apertura}</td>
-                    <td>{val.fecha_cierre}</td>
-                    <td>{val.monto_inicial}</td>
-                    <td>{val.monto_esperado}</td>
-                    <td>{val.monto_real}</td>
-                    <td>{val.diferencia}</td>
+                    <td className='fondo-usu'>{val.usuario}</td>
+                    <td>{new Date(val.fecha_apertura).toLocaleString()}</td>
+                    <td>{new Date(val.fecha_cierre).toLocaleString()}</td>
+                    <td>{formatCurrency(val.monto_inicial)}</td>
+                    <td className='fondo-esperado'>{formatCurrency(val.monto_esperado)}</td>
+                    <td className='fondo-real'><b>{formatCurrency(val.monto_real)}</b></td>
+                    <td className='fondo-dif'>{formatCurrency(val.diferencia)}</td>
                     </tr>
                 ))}
             </tbody>

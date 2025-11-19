@@ -352,3 +352,20 @@
 .contenedor-datos-creditos{
   background-color: #ff5e5e;
 }
+
+/* ESTILOS PARA EL COMPONENTE MOV USUARIOS*/
+.fondo-usu{
+background-color: #9bbcff;
+}
+
+.fondo-dif{
+  background-color: rgb(255, 156, 156);
+}
+
+.fondo-esperado{
+  background-color: #9dffb2;
+}
+
+.fondo-real{
+background-color: rgb(255, 255, 184);
+}
