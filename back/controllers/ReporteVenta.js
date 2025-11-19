@@ -42,4 +42,52 @@ const verTotalVendidoMetodos = (req,res) => {
                         })
 }
 
-module.exports = {verTotalVendido,verTotalVendidoClientes,verTotalVendidoMetodos}
+const verResumenVentas = (req,res) => {
+    const {fechaInicio, fechaFin} = req.query
+    connection.query(`SELECT 
+                            CASE 
+                                WHEN v.faltaPagar = 0 THEN 'Pagado'
+                                WHEN v.faltaPagar > 0 THEN 'Falta pagar'
+                            END AS estado_venta,
+                            COUNT(*) AS total
+                        FROM venta v
+                        WHERE DATE(v.fecha_registro) BETWEEN ? AND ?
+                        GROUP BY estado_venta`,[fechaInicio,fechaFin],(error,results) => {
+                            if(error) throw error
+                            res.json(results)
+                        })
+}
+
+const verProductosMasVendidos = (req,res) => {
+    const {fechaInicio, fechaFin} = req.query
+    connection.query(`SELECT 
+                            p.nombre_producto,
+                            SUM(dv.cantidadVendida) AS total_vendido
+                        FROM detalleventa dv
+                        INNER JOIN venta v ON dv.Id_venta = v.Id_venta
+                        INNER JOIN productos p ON dv.Id_producto = p.Id_producto
+                        WHERE DATE(v.fecha_registro) BETWEEN ? AND ?
+                        GROUP BY dv.Id_producto
+                        ORDER BY total_vendido DESC
+                        LIMIT 5`,[fechaInicio, fechaFin],(error,results) => {
+                            if (error) throw error
+                            res.json(results)
+                        })
+}
+
+const verUsosPresentacion = (req,res) => {
+    const {fechaInicio, fechaFin} = req.query
+    connection.query(`SELECT 
+                            dv.tipoVenta,
+                            COUNT(*) AS cantidad_usos
+                        FROM detalleventa dv
+                        INNER JOIN venta v ON dv.Id_venta = v.Id_venta
+                        WHERE DATE(v.fecha_registro) BETWEEN ? AND ?
+                        GROUP BY dv.tipoVenta`,[fechaInicio, fechaFin],(error,results) => {
+                            if (error) throw error
+                            res.json(results)
+                        })
+}
+
+
+module.exports = {verTotalVendido,verTotalVendidoClientes,verTotalVendidoMetodos, verResumenVentas, verProductosMasVendidos, verUsosPresentacion}

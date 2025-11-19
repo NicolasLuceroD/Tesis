@@ -31,6 +31,9 @@ const { URL } = useContext(DataContext)
 const [totalvendido,setTotalVendido] = useState([])
 const [totalvendidoclientes, setTotalVendidoClientes] = useState([])
 const [totalvendidometodos, setTotalVendidoMetodos] = useState([])
+const [resumenventas, setResumenVentas] = useState([])
+const [productosmasvendidos, setProductosMasVendidos] = useState([])
+const [usosporpresentacion, setUsosPorPresentacion] = useState([])
 
 //ESTADO PARA CALENDARIO
 const [fechaInicio, setFechaInicio] = useState(null);
@@ -40,7 +43,7 @@ const [fechaFin, setFechaFin] = useState(null);
 const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
 
 
-//TRAER TOTAL COMPRADO POR CADA DROGUERIA
+//TRAER TOTAL VENDIDO EN UN RANGO DE FECHAS
   const verTotalVendido = () => {
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd');
@@ -59,7 +62,7 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     }
   }
 
-//TRAER LA SUMATORIA GASTADA
+//TRAER TOTAL VENDIDO A CLIENTES
   const verTotalVendidoClientes = () => {
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd');
@@ -79,7 +82,7 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     }
   }
 
-  //TRAER PRODUCTOS MAS COMPRADOS
+  //TRAER TOTAL VENDIDO METODOS DE PAGO
   const verTotalVendidoMetodos = () => {
     if (fechaInicio && fechaFin){
       const inicio = format(fechaInicio, 'yyyy-MM-dd')
@@ -97,7 +100,60 @@ const lastDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() 
     }
   }
 
+  
+  //TRAER RESUMEN VENTAS PAGADAS VS FALTAN PAGAR
+  const verResumenVentas = () => {
+    if (fechaInicio && fechaFin){
+      const inicio = format(fechaInicio, 'yyyy-MM-dd')
+      const fin = format(fechaFin, 'yyyy-MM-dd')
+      axios.get(`${URL}reporteventa/verResumenVentas`,{
+        params: 
+        {
+          fechaInicio: inicio,
+          fechaFin: fin
+        }
+      }).then((response) => {
+        setResumenVentas(response.data)
+        console.log('Resumen: ',response.data)
+      })
+    }
+  }
 
+  //TRAER PRODUCTOS MAS VENDIDOS
+  const verProductosMasVendidos = () => {
+     if (fechaInicio && fechaFin){
+      const inicio = format(fechaInicio, 'yyyy-MM-dd')
+      const fin = format(fechaFin, 'yyyy-MM-dd')
+      axios.get(`${URL}reporteventa/verProductosMasVendidos`,{
+        params: 
+        {
+          fechaInicio: inicio,
+          fechaFin: fin
+        }
+      }).then((response) => {
+        setProductosMasVendidos(response.data)
+        console.log('Productos mas vendidos: ',response.data)
+      })
+    }
+  }
+
+  //TRAER USOS POR PRESENTACION
+  const verUsosPorPresentacion = () => {
+     if (fechaInicio && fechaFin){
+      const inicio = format(fechaInicio, 'yyyy-MM-dd')
+      const fin = format(fechaFin, 'yyyy-MM-dd')
+      axios.get(`${URL}reporteventa/verUsosPresentacion`,{
+        params: 
+        {
+          fechaInicio: inicio,
+          fechaFin: fin
+        }
+      }).then((response) => {
+        setUsosPorPresentacion(response.data)
+        console.log('presentacion: ',response.data)
+      })
+    }
+  }
 
 
 //FUNCION FORMATO MONEDA
@@ -124,6 +180,9 @@ useEffect(()=>{
   verTotalVendido()
   verTotalVendidoClientes()
   verTotalVendidoMetodos()
+  verResumenVentas()
+  verProductosMasVendidos()
+  verUsosPorPresentacion()
 },[fechaInicio, fechaFin])
 
 
@@ -163,69 +222,208 @@ useEffect(()=>{
   <p>MONTO TOTAL VENDIDO A LA FECHA: <strong>{formatCurrency(totalvendido)}</strong></p>
 </div>
 
-<div style={{ flex: '0 0 48%', marginBottom: '20px' }}>
-    <h5 style={{textAlign: 'center'}}>TOTAL VENDIDO A CLIENTES</h5>
-    {totalvendidoclientes.length === 0 ?(
-      <DataReportes/>
+<div className="dashboard-grid">
+
+  {/* ───────────────────────────────────────── */}
+  {/* TOTAL VENDIDO A CLIENTES */}
+  <div className="chart-box">
+    <h5 style={{ textAlign: 'center' }}>TOTAL VENDIDO A CLIENTES</h5>
+    {totalvendidoclientes.length === 0 ? (
+      <DataReportes />
     ) : (
       <ResponsiveContainer width="95%" height={500}>
-              <BarChart data={totalvendidoclientes} layout="vertical">
-                <CartesianGrid strokeDasharray="8 8" />
-                <XAxis
-                  type="number"
-                  domain={[0, totalvendidoclientes.length > 0 ? Math.max(...totalvendidoclientes.map(item => item.total_vendido)) * 1.5 : 1000]}
-                  tickFormatter={formatCurrency}
-                />
-                <YAxis 
-                  type="category"  
-                  dataKey="nombre_cliente" 
-                  width={200} 
-                />
-                <Legend />
-                <Bar dataKey="total_vendido" barSize={12} fill="#ff5e5e" isAnimationActive={true} animationDuration={1500}>
-                  <LabelList 
-                    dataKey="total_vendido" 
-                    position="right" 
-                    formatter={formatCurrency}
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+        <BarChart data={totalvendidoclientes} layout="vertical">
+          <CartesianGrid strokeDasharray="8 8" />
+          <XAxis
+            type="number"
+            domain={[
+              0,
+              totalvendidoclientes.length > 0
+                ? Math.max(...totalvendidoclientes.map(item => item.total_vendido)) * 1.5
+                : 1000
+            ]}
+            tickFormatter={formatCurrency}
+          />
+          <YAxis type="category" dataKey="nombre_cliente" width={200} />
+          <Legend />
+          <Bar dataKey="total_vendido" barSize={12} fill="#ff5e5e">
+            <LabelList dataKey="total_vendido" position="right" formatter={formatCurrency} />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     )}
   </div>
 
-<br /><br />
+  {/* ───────────────────────────────────────── */}
+  {/* TOTAL VENDIDO POR MÉTODO DE PAGO */}
+  <div className="chart-box">
+  <h5 style={{ textAlign: 'center' }}>TOTAL VENDIDO MÉTODO DE PAGO</h5>
 
- <div className="col" style={{ flex: '1 1 45%', marginTop: '100px', minWidth: '300px' }}>
-           <h5 style={{textAlign: 'center'}}>TOTAL VENDIDO METODO DE PAGO</h5>
-          <div>
-              {totalvendidometodos.length === 0 ? (
-                  <DataReportes />
-              ) : (
-                  <ResponsiveContainer width="100%" height={500}>
-                  <PieChart>
-                     <Pie
-                        data={totalvendidometodos.map(item => ({...item,total_vendido: parseFloat(item.total_vendido)}))}
-                        dataKey="total_vendido"
-                        nameKey="metodo_pago"
-                        innerRadius={120}
-                        outerRadius={200}
-                        fill="#82ca9d"
-                        label={({ metodo_pago, total_vendido }) =>
-                          `${metodo_pago}: ${formatCurrency(total_vendido)}`
-                        }
-                      >
-                        {totalvendidometodos.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={Colors[index % Colors.length]} />
-                        ))}
-                      </Pie>
-
-                  </PieChart>
-                  </ResponsiveContainer>
-              )}
-          </div>
+  {totalvendidometodos.length === 0 ? (
+    <DataReportes />
+  ) : (
+    <div
+      style={{
+        width: 420,           // 🔥 MÁS ANCHO PARA QUE NO SE CORTEN
+        height: 330,
+        margin: "0 auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            cx="50%"           // 🔥 FIJA LA POSICIÓN, EVITA RECORTES
+            cy="50%"
+            data={totalvendidometodos.map(item => ({
+              ...item,
+              total_vendido: parseFloat(item.total_vendido)
+            }))}
+            dataKey="total_vendido"
+            nameKey="metodo_pago"
+            innerRadius={70}
+            outerRadius={100}
+            paddingAngle={2}
+            labelLine={true}
+            label={({ total_vendido }) =>
+              `${formatCurrency(total_vendido)}`
+            }
+          >
+            {totalvendidometodos.map((entry, index) => (
+              <Cell key={index} fill={Colors[index % Colors.length]} />
+            ))}
+          </Pie>
+          <Legend verticalAlign="bottom" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  )}
 </div>
 
+  {/* ───────────────────────────────────────── */}
+  {/* PAGADO VS FALTA PAGAR */}
+  <div className="chart-box">
+  <h5 style={{ textAlign: 'center' }}>FALTA PAGAR VS PAGADO</h5>
+  {resumenventas.length === 0 ? (
+    <DataReportes />
+  ) : (
+    <div
+      style={{
+        width: 420,      
+        height: 330,      
+        margin: "0 auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={resumenventas.map(item => ({
+              ...item,
+              total: parseFloat(item.total)
+            }))}
+            dataKey="total"
+            nameKey="estado_venta"
+            innerRadius={70}   
+            outerRadius={100}  
+            paddingAngle={2}
+            labelLine={true}
+            label={({ total }) =>
+              `${(total)}`
+            }
+          >
+            {resumenventas.map((entry, index) => (
+              <Cell key={index} fill={Colors[index % Colors.length]} />
+            ))}
+          </Pie>
+          <Legend verticalAlign="bottom" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  )}
+</div>
+
+  {/* ───────────────────────────────────────── */}
+  {/* TOP PRODUCTOS MÁS VENDIDOS */}
+  <div className="chart-box">
+    <h5 style={{ textAlign: 'center' }}>TOP PRODUCTOS MÁS VENDIDOS</h5>
+    {productosmasvendidos.length === 0 ? (
+      <DataReportes />
+    ) : (
+      <ResponsiveContainer width="95%" height={500}>
+        <BarChart data={productosmasvendidos} layout="vertical">
+          <CartesianGrid strokeDasharray="8 8" />
+          <XAxis
+            type="number"
+            domain={[
+              0,
+              productosmasvendidos.length > 0
+                ? Math.max(...productosmasvendidos.map(item => item.total_vendido)) * 1.5
+                : 1000
+            ]}
+          />
+          <YAxis type="category" dataKey="nombre_producto" width={200} />
+          <Legend />
+          <Bar dataKey="total_vendido" barSize={12} fill="#ff5e5e">
+            <LabelList
+              dataKey="total_vendido"
+              position="right"
+              formatter={value => parseInt(value)}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    )}
+  </div>
+
+  {/* ───────────────────────────────────────── */}
+  {/* USOS POR PRESENTACIÓN */}
+ <div className="chart-box">
+  <h5 style={{ textAlign: 'center' }}>USOS POR PRESENTACIÓN</h5>
+  {usosporpresentacion.length === 0 ? (
+    <DataReportes />
+  ) : (
+    <div
+      style={{
+        width: 420,
+        height: 330,
+        margin: "0 auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            cx="50%"          
+            cy="50%"
+            data={usosporpresentacion.map((item) => ({...item,cantidad_usos: parseFloat(item.cantidad_usos)}))}
+            dataKey="cantidad_usos"
+            nameKey="tipoVenta"
+            innerRadius={70}
+            outerRadius={100}
+            paddingAngle={2}
+            labelLine={true}
+            label={({ cantidad_usos }) => cantidad_usos}
+            labelStyle={{ fontSize: 11 }}
+          >
+            {usosporpresentacion.map((entry, index) => (
+              <Cell key={index} fill={Colors[index % Colors.length]} />
+            ))}
+          </Pie>
+          <Legend verticalAlign="bottom" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  )}
+</div>
+
+</div>
 </>
   )
 }

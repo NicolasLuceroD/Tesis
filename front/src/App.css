@@ -369,3 +369,10 @@ background-color: #9bbcff;
 .fondo-real{
 background-color: rgb(255, 255, 184);
 }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+  gap: 40px;
+  margin: 40px;
+}
