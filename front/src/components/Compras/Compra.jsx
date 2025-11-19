@@ -128,7 +128,14 @@ const Compra = () => {
   );
 
   if (algunProductoSinFecha) {
-    alert('Por favor colocar fecha de vencimiento a todos los productos');
+    Swal.fire({
+      icon: 'warning',
+      title: 'Advertencia',
+      text: 'Por favor colocar fecha de vencimiento a todos los productos.',
+      timerProgressBar: true,
+      confirmButtonText: 'Volver',
+      timer: 3500
+    })
     return;
   }
   axios.post(`${URL}compra/post`, {
@@ -349,7 +356,14 @@ const agregarProductoACompra = (producto) => {
     // Actualizar el estado
     setProductosCompra(productosActualizados);
 
-    alert("Producto con la misma fecha de vencimiento encontrado. Se ha sumado la cantidad al producto existente.");
+    Swal.fire({
+      icon: 'success',
+      title: 'Bien hecho!',
+      text: 'Producto con la misma fecha de vencimiento encontrado. Se ha sumado la cantidad al producto existente.',
+      timerProgressBar: true,
+      confirmButtonText: 'Aceptar',
+      timer: 3500
+    })
 
   } else {
     // Caso 2: No existe un duplicado exacto.

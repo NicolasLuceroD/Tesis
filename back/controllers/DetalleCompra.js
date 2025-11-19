@@ -17,22 +17,24 @@ const registrarDetalleCompra = (req,res) => {
 
 const verDetalleCompraCompletoAgrupado = (req, res) => {
   connection.query(`
-    SELECT 
-      c.Id_compra,
-      c.fecha_registro,
-      c.Total,
-      dc.Id_detalleCompra,
-      dc.Id_producto,
-      dc.Cantidad,
-      dc.Precio_costo,
-      dc.Fecha_registro AS Fecha_registro,
-      p.nombre_producto,
-      dr.nombre_drogueria AS nombre_drogueria
+   SELECT 
+        c.Id_compra,
+        c.fecha_registro,
+        c.Total,
+        dc.Id_detalleCompra,
+        dc.Id_producto,
+        dc.Cantidad,
+        dc.Precio_costo,
+        dc.Fecha_registro AS Fecha_registro,
+        p.nombre_producto,
+        dr.nombre_drogueria AS nombre_drogueria,
+        mp.nombre_metodopago AS metodo_pago    
     FROM detallecompra dc
     INNER JOIN compra c ON c.Id_compra = dc.Id_compra
     INNER JOIN productos p ON p.Id_producto = dc.Id_producto
     INNER JOIN droguerias dr ON dr.Id_drogueria = c.Id_drogueria
-    ORDER BY c.Id_compra DESC, dc.Id_detalleCompra
+    INNER JOIN metodopago mp ON mp.Id_metodoPago = c.Id_metodoPago   
+    ORDER BY c.Id_compra DESC, dc.Id_detalleCompra;
   `, (error, results) => {
     if (error) {
       console.error('Error al traer los detalles de compra:', error);
@@ -46,6 +48,7 @@ const verDetalleCompraCompletoAgrupado = (req, res) => {
           fecha_registro: item.fecha_registro,
           precio_total: item.Total,
           nombre_drogueria: item.nombre_drogueria,
+          metodo_pago: item.metodo_pago,
           productos: []
         };
       }

@@ -113,6 +113,7 @@ useEffect(()=>{
       <th>CANTIDAD</th>
       <th>PRECIO COSTO</th>
       <th>TOTAL</th>
+      <th>METODO DE PAGO</th>
       <th>DROGUERIA</th>
       <th>FECHA REGISTRO</th>
     </tr>
@@ -155,6 +156,8 @@ useEffect(()=>{
         <td className='columna-detallec-precio'>
           <b>{formatCurrency(compra.precio_total)}</b>
         </td>
+
+        <td>{compra.metodo_pago}</td>
 
         {/* Nombre de */}
         <td>{compra.nombre_drogueria}</td>

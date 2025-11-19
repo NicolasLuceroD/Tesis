@@ -5,6 +5,7 @@ import App from '../App'
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import es from 'date-fns/locale/es';
+import ScrollToTopButton from './Utils/ScrollToTopButton'
 
 const MovimientoUsuarios = () => {
 
@@ -104,6 +105,7 @@ useEffect(()=>{
                 )}
             </tbody>
         </table>
+        <ScrollToTopButton/>
     </>
   )
 }
