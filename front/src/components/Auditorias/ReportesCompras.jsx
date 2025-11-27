@@ -157,7 +157,7 @@ useEffect(()=>{
     <>
     <App/>
      <div className="h3-subtitulos">
-            <h3>REPORTES</h3>
+            <h3>REPORTE COMPRAS</h3>
     </div><br />
 
     <h3 style={{ marginTop: '40px', textAlign: 'center' }}>
